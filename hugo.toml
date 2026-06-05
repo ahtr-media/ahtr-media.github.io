@@ -1,0 +1,27 @@
+baseURL = "https://ahtr-platform.github.io/"
+languageCode = "ja-jp"
+title = "いつもわかっている途中"
+theme = "ananke"
+
+[params]
+  description = "Always halfway through realising"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[menu]
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 10
+
+  [[menu.main]]
+    name = "Posts"
+    url = "/posts/"
+    weight = 20
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
