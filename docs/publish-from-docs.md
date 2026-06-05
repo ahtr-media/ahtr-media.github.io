@@ -8,7 +8,7 @@ publish スクリプトは **`~/Projects/ahtr/scripts/`** にあります（OAut
 
 - OAuth 設定済み（`~/Projects/ahtr/credentials/token.json`）
 - `~/Projects/ahtr/config/contributors.yaml` に編集者を登録
-- 本番 Hugo リポジトリ: **`ahtr/ahtr.github.io`**
+- 本番 Hugo リポジトリ: **`ahtr-media/ahtr-media.github.io`**
 
 ## Google Doc の書き方（冒頭メタ）
 
@@ -54,7 +54,7 @@ python scripts/publish_from_docs.py \
 ## 確認
 
 1. GitHub Actions が緑になる
-2. https://ahtr.github.io/posts/{slug}/
+2. https://ahtr-media.github.io/posts/{slug}/
 3. 記事下タイムラインにメッセージと **by 表示名**
 
 ## 関連（ローカル）

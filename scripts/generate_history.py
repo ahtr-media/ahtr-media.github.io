@@ -16,7 +16,7 @@ def repo_commit_base() -> str:
     try:
         url = run(["git", "remote", "get-url", "origin"]).strip()
     except subprocess.CalledProcessError:
-        return "https://github.com/ahtr-platform/ahtr-platform.github.io/commit"
+        return "https://github.com/ahtr-media/ahtr-media.github.io/commit"
     url = url.removesuffix(".git")
     if url.startswith("git@"):
         # git@github.com:org/repo.git
@@ -25,7 +25,7 @@ def repo_commit_base() -> str:
     if "github.com/" in url:
         path = url.split("github.com/", 1)[-1]
         return f"https://github.com/{path}/commit"
-    return "https://github.com/ahtr-platform/ahtr-platform.github.io/commit"
+    return "https://github.com/ahtr-media/ahtr-media.github.io/commit"
 
 
 def safe_key_from_relpath(relpath: str) -> str:

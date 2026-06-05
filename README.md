@@ -2,7 +2,7 @@
 
 科研 AHTR「記述プラットフォーム」の公開サイト（Hugo + GitHub Pages）。
 
-- **本番 URL:** https://ahtr.github.io/
+- **本番 URL:** https://ahtr-media.github.io/
 - **原稿:** Google Docs → 半自動 publish → 本リポジトリ
 - **運用ドキュメント:** [`docs/`](docs/)
 
