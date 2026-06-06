@@ -36,7 +36,7 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     commit_base = repo_commit_base()
 
-    md_files = [p for p in CONTENT_DIR.rglob("*.md") if p.is_file()]
+    md_files = [p for p in CONTENT_DIR.rglob("*.md") if p.is_file() and p.name != "README.md"]
     if not md_files:
         print("No markdown files found under content/.")
         return
