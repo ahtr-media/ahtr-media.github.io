@@ -1,5 +1,5 @@
 ---
-title: "Test 2"
+title: "Test 2 edited"
 author: 山をおりる
 date: 2026-06-06
 lastmod: 2026-06-06
@@ -12,3 +12,4 @@ tags:
 ---
 
 初稿です。
+初稿に対して修正を加えました。
