@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "content_path": "content/posts/bookguide-daisuke-kawanaka/index.md",
+  "doc_id": "1ypdxZzDeUWVnvlrfRAEMfCJ4myuF0rOTGoh0_-JtinQ",
+  "published_at": "2026-06-08T05:48:54.680117+00:00",
+  "comments": [
+    {
+      "id": "AAAB86c6Og8",
+      "quoted_text": "一部分に",
+      "anchor": "kix.j9v70dm9gdkp",
+      "content": "本文の一部分にコメントやレビューを入れたい場合は、このようにGoogleドキュメントのコメント機能で記入してください。\n解決済み・削除をすると、サイトに表示されなくなります（履歴は残ります）。",
+      "created_time": "2026-06-06T05:39:14.502Z",
+      "modified_time": "2026-06-06T05:39:59.292Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Og4",
+      "quoted_text": "本文をここに",
+      "anchor": "kix.pouphsk46gxc",
+      "content": "原稿の本文をここに記入してください。必要に応じて見出しや画像、箇条書きなどを入力してください。",
+      "created_time": "2026-06-06T05:37:57.558Z",
+      "modified_time": "2026-06-06T05:37:57.558Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Og0",
+      "quoted_text": "一覧・OGP 用の短い要約（1〜2 文）。",
+      "anchor": "kix.qtr3b4li6tlw",
+      "content": "一覧ページに表示させる概要文です。編集にて記入するので、空けておいて大丈夫です。",
+      "created_time": "2026-06-06T05:36:26.678Z",
+      "modified_time": "2026-06-06T05:36:26.678Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Ogw",
+      "quoted_text": "葛藤, 記述",
+      "anchor": "kix.1j4orqd10wks",
+      "content": "記事のタグを記入します。編集にて記入するので、空けておいて大丈夫です。",
+      "created_time": "2026-06-06T05:35:55.411Z",
+      "modified_time": "2026-06-06T05:35:55.411Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Ogs",
+      "quoted_text": "葛藤のブックガイド",
+      "anchor": "kix.8982r240gx5c",
+      "content": "記事のカテゴリを記入します。下記のいずれかです。\n–\n葛藤のブックガイド／わたしの葛藤／論文のB面／となりの葛藤／書きかけフィールドノート／1.5次元記述の実践",
+      "created_time": "2026-06-06T05:35:26.055Z",
+      "modified_time": "2026-06-06T05:35:26.055Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Ogo",
+      "quoted_text": "山をおりる",
+      "anchor": "kix.lsgixxeukaow",
+      "content": "執筆者名を記入してください。",
+      "created_time": "2026-06-06T05:34:15.817Z",
+      "modified_time": "2026-06-06T05:34:15.817Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Ogk",
+      "quoted_text": "my-article",
+      "anchor": "kix.umhrhzxpzhn6",
+      "content": "記事のURLです。希望があれば記入してください。\n編集側で記入しますので、空けておいても大丈夫です。",
+      "created_time": "2026-06-06T05:33:59.025Z",
+      "modified_time": "2026-06-06T05:33:59.025Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB86c6Ogg",
+      "quoted_text": "記事タイトル",
+      "anchor": "kix.5qfhnec27s78",
+      "content": "記事のタイトルを記入してください。\n空けておいて編集に依頼することも可能です。",
+      "created_time": "2026-06-06T05:33:08.374Z",
+      "modified_time": "2026-06-06T05:33:08.374Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    }
+  ]
+}
