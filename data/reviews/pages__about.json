@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "content_path": "content/pages/about/index.md",
+  "doc_id": "16JwBdq__eE0xGsSJAWaXpqo3nbRhFoT0srbKPPoIaUU",
+  "published_at": "2026-06-27T02:35:31.736918+00:00",
+  "comments": [
+    {
+      "id": "AAAB9N0rm_4",
+      "quoted_text": "本研究について詳しく知る（アコーディオン表示）",
+      "anchor": "kix.cqlre4qz38lg",
+      "content": "ここまでは、非専門家である一般読者向けに、可能な限り噛み砕きつつ、実践しようとしている専門的な意図を伝えられるような内容として記述しました。\n他方で、科研費による研究プロジェクトでもあるので、ウェブサイトの仕組みも含め、より詳しい説明があってもいいなと思っています。そうした内容を記載したうえで、重複部分もあり長くなってしまうので、アコーディオン表示（見出しだけ表示されていて、クリックすると本文が表示される）としておくことを想定しています。",
+      "created_time": "2026-06-27T01:53:48.720Z",
+      "modified_time": "2026-06-27T01:53:48.720Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    },
+    {
+      "id": "AAAB9N0rm_Y",
+      "quoted_text": "ウェブサイト",
+      "anchor": "kix.hxa07w1li7ac",
+      "content": "本文の一部分にコメントやレビューを入れたい場合は、このようにGoogleドキュメントのコメント機能で記入してください。\n解決済み・削除をすると、サイトに表示されなくなります（履歴は残ります）。",
+      "created_time": "2026-06-27T01:41:52.538Z",
+      "modified_time": "2026-06-27T01:41:52.538Z",
+      "status": "open",
+      "author": {
+        "display_name": "山をおりる",
+        "email": null
+      },
+      "replies": []
+    }
+  ]
+}
