@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}">
+  <div class="site-bg" aria-hidden="true"></div>
+  <div class="site-shell">
+    {{ partial "sidebar-left.html" . }}
+    <div class="col-center">
+      {{ block "main" . }}{{ end }}
+    </div>
+    <div class="col-side col-side--right" aria-hidden="true"></div>
+  </div>
+  {{ $js := resources.Get "js/main.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" defer></script>
+</body>
+</html>

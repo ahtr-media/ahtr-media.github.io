@@ -1,0 +1,52 @@
+{{ $currentCat := "" }}
+{{ if and (eq .Kind "term") (eq .Data.Singular "category") }}{{ $currentCat = .Title }}{{ end }}
+<section class="list-page" data-list-page data-current-cat="{{ $currentCat }}">
+  <div class="list-filters">
+    <label class="list-label" for="cat-select">カテゴリーを選択する</label>
+    <div class="list-select-wrap">
+      <select id="cat-select" class="list-select" data-cat-select>
+        <option value="">すべて</option>
+        {{ range site.Params.categories }}
+          <option value="{{ . }}" {{ if eq . $currentCat }}selected{{ end }}>{{ . }}</option>
+        {{ end }}
+      </select>
+    </div>
+    <button type="button" class="tag-toggle" data-tag-toggle aria-expanded="false">
+      タグで絞り込む
+      <span aria-hidden="true">+</span>
+    </button>
+    <div class="tag-panel" data-tag-panel hidden>
+      {{ $tags := site.Taxonomies.tags }}
+      {{ if $tags }}
+        <ul class="tag-list">
+          {{ range $name, $pages := $tags }}
+            <li>
+              <label>
+                <input type="checkbox" data-tag-filter value="{{ $name }}">
+                {{ $name }}
+              </label>
+            </li>
+          {{ end }}
+        </ul>
+      {{ else }}
+        <p class="tag-empty">タグはまだありません。</p>
+      {{ end }}
+    </div>
+  </div>
+
+  {{ $pages := where site.RegularPages "Type" "posts" }}
+  {{ if eq .Kind "term" }}
+    {{ $pages = .Pages }}
+  {{ end }}
+
+  <div class="list-meta">
+    <p class="list-count"><strong data-list-count>{{ len $pages }}</strong> 記事</p>
+    <p class="list-sort">新しい順</p>
+  </div>
+
+  <div class="cat-cards" data-list-cards>
+    {{ range $pages.ByDate.Reverse }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+</section>

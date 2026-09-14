@@ -1,3 +1,8 @@
+---
+build:
+  render: never
+  list: never
+---
 # 記事ディレクトリ（Page Bundle）
 
 ```

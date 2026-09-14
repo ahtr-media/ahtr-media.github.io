@@ -1,0 +1,40 @@
+{{ $feed := slice }}
+{{- range $p := site.RegularPages -}}
+  {{- with $p.File -}}
+    {{- $key := replace (replace .Path "/" "__") "." "_" -}}
+    {{- $hist := index site.Data.history $key -}}
+    {{- if $hist -}}
+      {{- range $hist -}}
+        {{- $feed = $feed | append (merge . (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{ $feed = sort $feed "date" "desc" }}
+
+<section class="history-block" id="history">
+  <header class="history-head">
+    <h2>更新履歴</h2>
+    <p class="history-kicker">HISTORY</p>
+  </header>
+  {{ if gt (len $feed) 0 }}
+    <ul class="history-list">
+      {{ range first 12 $feed }}
+        {{ $t := time .date }}
+        <li class="history-item">
+          <a href="{{ .pageURL }}">
+            <div class="history-item-top">
+              <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time>
+              <span class="history-item-title">{{ .pageTitle }}</span>
+              <span class="history-chevron" aria-hidden="true">›</span>
+            </div>
+            {{ with .author }}<p class="history-item-meta">（編集者: {{ . }}）</p>{{ end }}
+            <p class="history-item-msg">{{ .message }}</p>
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  {{ else }}
+    <p class="history-empty">まだ更新履歴がありません。</p>
+  {{ end }}
+</section>

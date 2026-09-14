@@ -1,0 +1,6 @@
+{{/* ページのカテゴリ名（文字列）を返す */}}
+{{- with .Params.categories -}}
+  {{- if reflect.IsSlice . -}}{{- index . 0 -}}{{- else -}}{{- . -}}{{- end -}}
+{{- else -}}
+  {{- .Params.category -}}
+{{- end -}}

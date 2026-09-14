@@ -1,0 +1,11 @@
+{{ $published := .Date }}
+{{ $updated := .Lastmod }}
+{{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
+<p class="adates">
+  {{ if not $published.IsZero }}
+    <time class="adates-first" datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time>
+  {{ end }}
+  {{ if not $updated.IsZero }}
+    <time class="adates-last" datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time>
+  {{ end }}
+</p>

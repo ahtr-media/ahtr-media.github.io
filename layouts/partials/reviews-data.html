@@ -1,0 +1,7 @@
+{{ if .File }}
+  {{ $key := replace (path.Dir .File.Path) "/" "__" }}
+  {{ $rev := index site.Data.reviews $key }}
+  {{ if $rev }}
+    <script type="application/json" id="reviews-data">{{ $rev | jsonify | safeJS }}</script>
+  {{ end }}
+{{ end }}

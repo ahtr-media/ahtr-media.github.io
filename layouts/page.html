@@ -1,0 +1,29 @@
+{{ define "main" }}
+<article class="article" data-article>
+  {{ $cat := partial "cat.html" . }}
+  {{ if $cat }}
+    <p class="article-cat"><a href="{{ "posts/" | relURL }}?cat={{ $cat | urlquery }}">{{ $cat }}</a></p>
+  {{ end }}
+  <h1 class="article-title">{{ .Title }}</h1>
+  {{ with .Params.author }}<p class="article-author">{{ . }}</p>{{ end }}
+  {{ partial "article-dates.html" . }}
+  {{ with .Params.description }}<p class="article-lead">{{ . }}</p>{{ end }}
+  {{ with .Params.tags }}
+    <ul class="article-tags">
+      {{ range . }}
+        <li><a href="{{ "tags/" | relURL }}{{ . | urlize }}/">{{ . }}</a></li>
+      {{ end }}
+    </ul>
+  {{ end }}
+  {{ with .Resources.GetMatch "top*" }}
+    <figure class="article-hero">
+      <img src="{{ .RelPermalink }}" alt="">
+    </figure>
+  {{ end }}
+  <div class="article-body" data-article-body>
+    {{ .Content }}
+  </div>
+  {{ partial "history-timeline.html" . }}
+  {{ partial "reviews-data.html" . }}
+</article>
+{{ end }}

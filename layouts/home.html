@@ -1,0 +1,46 @@
+{{ define "main" }}
+<header class="hero-mobile">
+  <h1 class="site-title-ja">いつも<br>わかっている<br>途中</h1>
+</header>
+
+{{ partial "history-feed.html" . }}
+
+<section class="snap" aria-label="スナップ写真">
+  <header class="block-head block-head--light">
+    <p class="block-kicker">Snap</p>
+    <h2>スナップ写真</h2>
+  </header>
+  <div class="snap-frame" role="img" aria-label="スナップ写真（準備中）"></div>
+</section>
+
+<section class="cat-block" data-home-cats>
+  <header class="block-head block-head--light">
+    <p class="block-kicker">Category</p>
+    <h2>カテゴリー</h2>
+  </header>
+  <div class="cat-pills" role="tablist" aria-label="カテゴリー">
+    {{ $cats := .Site.Params.categories }}
+    {{ range $i, $c := $cats }}
+      <button
+        type="button"
+        class="cat-pill{{ if eq $i 0 }} is-active{{ end }}"
+        role="tab"
+        data-cat="{{ $c }}"
+        data-list="{{ "posts/" | relURL }}?cat={{ $c | urlquery }}"
+        aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}"
+      >{{ $c }}</button>
+    {{ end }}
+  </div>
+  <div class="cat-cards">
+    {{ $posts := where site.RegularPages "Type" "posts" }}
+    {{ range $posts }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+  {{ with index $cats 0 }}
+    <p class="cat-more">
+      <a class="cat-more-link" data-cat-more href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">このカテゴリーを見る</a>
+    </p>
+  {{ end }}
+</section>
+{{ end }}

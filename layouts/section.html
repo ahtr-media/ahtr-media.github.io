@@ -1,0 +1,14 @@
+{{ define "main" }}
+{{ if eq .Section "posts" }}
+  {{ partial "list-page.html" . }}
+{{ else }}
+  <section class="list-page">
+    <h1>{{ .Title }}</h1>
+    <ul class="terms-list">
+      {{ range .Pages }}
+        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}
+{{ end }}

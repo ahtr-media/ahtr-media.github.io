@@ -1,0 +1,29 @@
+{{ $cat := partial "cat.html" . }}
+{{ $href := .RelPermalink }}
+{{ $desc := .Params.description | default "" }}
+{{ $img := false }}
+{{ with .Resources.GetMatch "top*" }}{{ $img = .RelPermalink }}{{ end }}
+<article
+  class="acard"
+  data-card
+  data-href="{{ $href }}"
+  data-category="{{ $cat }}"
+  {{ with .Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
+>
+  <div class="acard-row" role="button" tabindex="0" aria-expanded="false">
+    <div class="acard-main">
+      <h3 class="acard-title">{{ .Title }}</h3>
+      {{ with .Params.author }}<p class="acard-author">{{ . }}</p>{{ end }}
+      {{ partial "article-dates.html" . }}
+    </div>
+    <span class="acard-icon" aria-hidden="true">+</span>
+  </div>
+  <div class="acard-body" hidden>
+    {{ with $desc }}<p class="acard-desc">{{ . }}</p>{{ end }}
+    {{ if $img }}
+      <figure class="acard-fig">
+        <img src="{{ $img }}" alt="">
+      </figure>
+    {{ end }}
+  </div>
+</article>
