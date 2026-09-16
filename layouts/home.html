@@ -5,13 +5,18 @@
 
 {{ partial "history-feed.html" . }}
 
+{{ $snap := partial "featured-snap.html" . }}
+{{ with $snap }}
 <section class="snap" aria-label="スナップ写真">
   <header class="block-head block-head--light">
     <p class="block-kicker">Snap</p>
     <h2>スナップ写真</h2>
   </header>
-  <div class="snap-frame" role="img" aria-label="スナップ写真（準備中）"></div>
+  <div class="snap-frame">
+    <img src="{{ printf "snaps/%s" .file | relURL }}" alt="{{ .alt | default .caption }}">
+  </div>
 </section>
+{{ end }}
 
 <section class="cat-block" data-home-cats>
   <header class="block-head block-head--light">
@@ -31,6 +36,7 @@
       >{{ $c }}</button>
     {{ end }}
   </div>
+  <div class="cat-rule" aria-hidden="true"></div>
   <div class="cat-cards">
     {{ $posts := where site.RegularPages "Type" "posts" }}
     {{ range $posts }}
@@ -39,7 +45,7 @@
   </div>
   {{ with index $cats 0 }}
     <p class="cat-more">
-      <a class="cat-more-link" data-cat-more href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">このカテゴリーを見る</a>
+      <a class="cat-more-link" data-cat-more href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">このカテゴリーを見る <span aria-hidden="true">→</span></a>
     </p>
   {{ end }}
 </section>

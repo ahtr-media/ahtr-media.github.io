@@ -1,0 +1,8 @@
+{{ $feat := false }}
+{{- with site.Data.snaps -}}
+  {{- range . -}}
+    {{- if .background -}}{{ $feat = . }}{{- end -}}
+  {{- end -}}
+  {{- if not $feat -}}{{ $feat = index . 0 }}{{- end -}}
+{{- end -}}
+{{ return $feat }}

@@ -3,10 +3,11 @@
 <head>
   {{ partial "head.html" . }}
 </head>
-<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}">
+{{ $snap := partial "featured-snap.html" . }}
+<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}"{{ with $snap }} style="--snap-image: url('{{ printf "snaps/%s" .file | relURL }}')"{{ end }}>
   <div class="site-bg" aria-hidden="true"></div>
   <div class="site-shell">
-    {{ partial "sidebar-left.html" . }}
+    {{ partial "sidebar-left.html" (dict "page" . "snap" $snap) }}
     <div class="col-center">
       {{ block "main" . }}{{ end }}
     </div>

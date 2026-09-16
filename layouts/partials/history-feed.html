@@ -4,8 +4,11 @@
     {{- $key := replace (replace .Path "/" "__") "." "_" -}}
     {{- $hist := index site.Data.history $key -}}
     {{- if $hist -}}
-      {{- range $hist -}}
-        {{- $feed = $feed | append (merge . (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink)) -}}
+      {{- $sorted := sort $hist "date" "asc" -}}
+      {{- range $i, $h := $sorted -}}
+        {{- $ver := printf "v%d" (add $i 1) -}}
+        {{- with $h.version -}}{{ $ver = . }}{{- end -}}
+        {{- $feed = $feed | append (merge $h (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink "version" $ver)) -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}
@@ -28,7 +31,12 @@
               <span class="history-item-title">{{ .pageTitle }}</span>
               <span class="history-chevron" aria-hidden="true">›</span>
             </div>
-            {{ with .author }}<p class="history-item-meta">（編集者: {{ . }}）</p>{{ end }}
+            {{ if or .version .author }}
+              <p class="history-item-meta">
+                {{ with .version }}<span class="history-item-ver">{{ . }}</span>{{ end }}
+                {{ with .author }}<span class="history-item-editor">（編集者: {{ . }}）</span>{{ end }}
+              </p>
+            {{ end }}
             <p class="history-item-msg">{{ .message }}</p>
           </a>
         </li>

@@ -1,0 +1,17 @@
+# スナップ写真のメタ。公開担当が、画像ファイルと同じ PR で書く。
+# Google Doc には書かない（記事の publish と切り離す）。
+#
+# file        static/snaps/ のファイル名
+# caption     画面に出す短い説明。何が写っているか（PC 左下）
+# credit      撮影者・権利表記。空なら出さない
+# date        撮影年月。空なら出さない
+# alt         読み上げ・画像オフ用。caption と同じでよい
+# background  true の 1 枚を PC 背景にする（複数 true なら後ろが勝つ）
+# credit / source にコロンを含むときは引用符で囲む（YAML の制約）
+
+- file: philipp-fog-forest.jpg
+  caption: 霧にけむる針葉樹林
+  credit: "撮影: Philipp（Unsplash）"
+  alt: 朝霧にけむる針葉樹の森
+  background: true
+  source: "unsplash:upR8raSXvwg"

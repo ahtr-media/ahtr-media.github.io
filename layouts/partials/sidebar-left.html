@@ -2,12 +2,14 @@
   <div class="side-brand">
     <a class="site-title-ja" href="{{ "/" | relURL }}">いつも<br>わかっている<br>途中</a>
     <p class="site-title-en">Always Halfway<br>Through Realising</p>
-    <p class="site-tagline">{{ .Site.Params.tagline }}</p>
+    <p class="site-tagline">まちづくりにおける<br>葛藤・問い・実践の<br>循環</p>
   </div>
   <div class="side-foot">
-    {{ with .Site.Params.photo_caption }}<p class="side-credit">{{ . }}</p>{{ end }}
-    {{ with .Site.Params.photo_credit }}<p class="side-credit">{{ . }}</p>{{ end }}
-    {{ with .Site.Params.photo_date }}<p class="side-credit">{{ . }}</p>{{ end }}
-    <p class="side-copy">{{ .Site.Params.copyright }}</p>
+    {{ with .snap }}
+      {{ with .caption }}<p class="side-credit">{{ . }}</p>{{ end }}
+      {{ with .credit }}<p class="side-credit">{{ . }}</p>{{ end }}
+      {{ with .date }}<p class="side-credit">{{ . }}</p>{{ end }}
+    {{ end }}
+    <p class="side-copy">{{ .page.Site.Params.copyright }}</p>
   </div>
 </aside>
