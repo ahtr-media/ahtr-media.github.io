@@ -4,9 +4,21 @@
     {{- $key := replace (replace .Path "/" "__") "." "_" -}}
     {{- $hist := index site.Data.history $key -}}
     {{- if $hist -}}
+      {{- $pageAuthor := $p.Params.author | default "" -}}
       {{- $sorted := sort $hist "date" "asc" -}}
+      {{- $major := 0 -}}
+      {{- $minor := 0 -}}
       {{- range $i, $h := $sorted -}}
-        {{- $ver := printf "v%d" (add $i 1) -}}
+        {{- if eq $i 0 -}}
+          {{- $major = 1 -}}
+          {{- $minor = 0 -}}
+        {{- else if and $pageAuthor (eq ($h.author | default "") $pageAuthor) -}}
+          {{- $major = add $major 1 -}}
+          {{- $minor = 0 -}}
+        {{- else -}}
+          {{- $minor = add $minor 1 -}}
+        {{- end -}}
+        {{- $ver := printf "v%d.%d" $major $minor -}}
         {{- with $h.version -}}{{ $ver = . }}{{- end -}}
         {{- $feed = $feed | append (merge $h (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink "version" $ver)) -}}
       {{- end -}}
@@ -29,7 +41,11 @@
             <div class="history-item-top">
               <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time>
               <span class="history-item-title">{{ .pageTitle }}</span>
-              <span class="history-chevron" aria-hidden="true">›</span>
+              <span class="history-chevron" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 2.5 11.5 8 5 13.5"/>
+                </svg>
+              </span>
             </div>
             {{ if or .version .author }}
               <p class="history-item-meta">

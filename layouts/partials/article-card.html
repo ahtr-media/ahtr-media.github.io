@@ -10,13 +10,13 @@
   data-category="{{ $cat }}"
   {{ with .Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
 >
-  <div class="acard-row" role="button" tabindex="0" aria-expanded="false">
+  <div class="acard-row" tabindex="0">
     <div class="acard-main">
       <h3 class="acard-title">{{ .Title }}</h3>
       {{ with .Params.author }}<p class="acard-author">{{ . }}</p>{{ end }}
       {{ partial "article-dates.html" . }}
     </div>
-    <span class="acard-icon" aria-hidden="true">+</span>
+    <button type="button" class="acard-icon" aria-expanded="false" aria-label="詳細を開く">+</button>
   </div>
   <div class="acard-body" hidden>
     {{ with $desc }}<p class="acard-desc">{{ . }}</p>{{ end }}

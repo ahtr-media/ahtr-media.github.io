@@ -6,33 +6,56 @@
       const row = card.querySelector(".acard-row");
       const body = card.querySelector(".acard-body");
       const icon = card.querySelector(".acard-icon");
-      if (!row || !body) return;
-      const toggle = () => {
-        if (card.classList.contains("is-open")) {
-          const href = card.getAttribute("data-href");
-          if (href) window.location.href = href;
-          return;
+      if (!row || !body || !icon) return;
+      const href = card.getAttribute("data-href");
+
+      const setClosed = (el) => {
+        el.classList.remove("is-open");
+        const b = el.querySelector(".acard-body");
+        const i = el.querySelector(".acard-icon");
+        if (b) b.hidden = true;
+        if (i) {
+          i.textContent = "+";
+          i.setAttribute("aria-expanded", "false");
+          i.setAttribute("aria-label", "詳細を開く");
         }
+      };
+
+      const openCard = () => {
         root.querySelectorAll("[data-card].is-open").forEach((other) => {
-          if (other === card) return;
-          other.classList.remove("is-open");
-          const b = other.querySelector(".acard-body");
-          const i = other.querySelector(".acard-icon");
-          const r = other.querySelector(".acard-row");
-          if (b) b.hidden = true;
-          if (i) i.textContent = "+";
-          if (r) r.setAttribute("aria-expanded", "false");
+          if (other !== card) setClosed(other);
         });
         card.classList.add("is-open");
         body.hidden = false;
-        if (icon) icon.textContent = "→";
-        row.setAttribute("aria-expanded", "true");
+        icon.textContent = "−";
+        icon.setAttribute("aria-expanded", "true");
+        icon.setAttribute("aria-label", "詳細を閉じる");
       };
-      row.addEventListener("click", toggle);
+
+      icon.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (card.classList.contains("is-open")) setClosed(card);
+        else openCard();
+      });
+
+      const activate = () => {
+        if (card.classList.contains("is-open")) {
+          if (href) window.location.href = href;
+          return;
+        }
+        openCard();
+      };
+
+      card.addEventListener("click", (e) => {
+        if (e.target.closest(".acard-icon")) return;
+        activate();
+      });
       row.addEventListener("keydown", (e) => {
+        if (e.target.closest(".acard-icon")) return;
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          toggle();
+          activate();
         }
       });
     });
