@@ -1,0 +1,28 @@
+{{ $ver := "v1.0" }}
+{{ with .File }}
+  {{ $key := replace (replace .Path "/" "__") "." "_" }}
+  {{ $hist := index site.Data.history $key }}
+  {{ if $hist }}
+    {{ $pageAuthor := $.Params.author | default "" }}
+    {{ $sorted := sort $hist "date" "asc" }}
+    {{ $vers := slice }}
+    {{ $major := 0 }}
+    {{ $minor := 0 }}
+    {{ range $i, $h := $sorted }}
+      {{ if eq $i 0 }}
+        {{ $major = 1 }}
+        {{ $minor = 0 }}
+      {{ else if and $pageAuthor (eq ($h.author | default "") $pageAuthor) }}
+        {{ $major = add $major 1 }}
+        {{ $minor = 0 }}
+      {{ else }}
+        {{ $minor = add $minor 1 }}
+      {{ end }}
+      {{ $cur := printf "v%d.%d" $major $minor }}
+      {{ with $h.version }}{{ $cur = . }}{{ end }}
+      {{ $vers = $vers | append $cur }}
+    {{ end }}
+    {{ with $vers }}{{ $ver = index . (sub (len .) 1) }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ return $ver }}

@@ -2,6 +2,7 @@
 {{ $updated := .Lastmod }}
 {{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
 <p class="adates">
+  <span class="adates-ver">{{ partial "page-version.html" . }}</span>
   {{ if not $published.IsZero }}
     <time class="adates-first" datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time>
   {{ end }}

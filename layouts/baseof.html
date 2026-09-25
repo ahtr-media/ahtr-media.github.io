@@ -10,6 +10,10 @@
     {{ partial "sidebar-left.html" (dict "page" . "snap" $snap) }}
     <div class="col-center">
       {{ block "main" . }}{{ end }}
+      <footer class="site-foot">
+        <p><a href="{{ "/" | relURL }}">いつもわかっている途中</a></p>
+        <p><a href="{{ "/" | relURL }}">Always Halfway Through Realising</a></p>
+      </footer>
     </div>
     <div class="col-side col-side--right" aria-hidden="true"></div>
   </div>

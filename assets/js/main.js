@@ -104,8 +104,10 @@
     const select = page.querySelector("[data-cat-select]");
     const toggle = page.querySelector("[data-tag-toggle]");
     const panel = page.querySelector("[data-tag-panel]");
+    const cardsWrap = page.querySelector("[data-list-cards]");
     const cards = [...page.querySelectorAll("[data-card]")];
-    const count = page.querySelector("[data-list-count]");
+    const count = page.querySelector("[data-list-count], .list-count-num");
+    const sortSelect = page.querySelector("[data-list-sort]");
 
     const applyList = () => {
       const cat = select ? select.value : page.getAttribute("data-current-cat") || "";
@@ -123,6 +125,18 @@
         if (ok) visible += 1;
       });
       if (count) count.textContent = String(visible);
+    };
+
+    const sortCards = () => {
+      if (!cardsWrap) return;
+      const dir = sortSelect ? sortSelect.value : "new";
+      const list = [...cardsWrap.querySelectorAll("[data-card]")];
+      list.sort((a, b) => {
+        const da = a.getAttribute("data-date") || "";
+        const db = b.getAttribute("data-date") || "";
+        return dir === "old" ? da.localeCompare(db) : db.localeCompare(da);
+      });
+      list.forEach((el) => cardsWrap.appendChild(el));
     };
 
     if (select) {
@@ -148,6 +162,8 @@
     page.querySelectorAll("[data-tag-filter]").forEach((el) => {
       el.addEventListener("change", applyList);
     });
+    if (sortSelect) sortSelect.addEventListener("change", sortCards);
+    sortCards();
     applyList();
   }
 

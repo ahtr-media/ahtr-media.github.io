@@ -14,6 +14,11 @@
   </header>
   <div class="snap-frame">
     <img src="{{ printf "snaps/%s" .file | relURL }}" alt="{{ .alt | default .caption }}">
+    <p class="snap-caption">
+      {{ with .caption }}<span>{{ . }}</span>{{ end }}
+      {{ with .credit }}<span>{{ . }}</span>{{ end }}
+      {{ with .date }}<span>{{ . }}</span>{{ end }}
+    </p>
   </div>
 </section>
 {{ end }}

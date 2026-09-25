@@ -40,8 +40,13 @@
   {{ end }}
 
   <div class="list-meta">
-    <p class="list-count"><strong data-list-count>{{ len $pages }}</strong> 記事</p>
-    <p class="list-sort">新しい順</p>
+    <p class="list-count"><span class="list-count-num" data-list-count>{{ len $pages }}</span><span class="list-count-unit">記事</span></p>
+    <div class="list-sort-wrap">
+      <select class="list-sort" data-list-sort aria-label="並び順">
+        <option value="new">新しい順</option>
+        <option value="old">古い順</option>
+      </select>
+    </div>
   </div>
 
   <div class="cat-cards" data-list-cards>
