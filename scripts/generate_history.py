@@ -47,7 +47,17 @@ def main():
         out_path = OUT_DIR / f"{key}.json"
 
         fmt = "%aI|%an|%s|%H"
-        raw = run(["git", "log", f"--pretty=format:{fmt}", "--", str(md)])
+        raw = run(
+            [
+                "git",
+                "log",
+                "--all",
+                "--follow",
+                f"--pretty=format:{fmt}",
+                "--",
+                str(md),
+            ]
+        )
 
         items = []
         if raw.strip():
@@ -56,6 +66,8 @@ def main():
                 if len(parts) != 4:
                     continue
                 date_iso, author, subject, sha = parts
+                if subject.strip() == "Scheduled bulk update":
+                    continue
                 items.append(
                     {
                         "date": date_iso,

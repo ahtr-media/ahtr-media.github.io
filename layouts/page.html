@@ -2,22 +2,31 @@
 <article class="article" data-article>
   {{ $cat := partial "cat.html" . }}
   {{ if $cat }}
+    <hr class="article-rule" aria-hidden="true">
     <p class="article-cat"><a href="{{ "posts/" | relURL }}?cat={{ $cat | urlquery }}">{{ $cat }}</a></p>
   {{ end }}
   <h1 class="article-title">{{ .Title }}</h1>
   {{ with .Params.author }}<p class="article-author">{{ . }}</p>{{ end }}
   {{ partial "article-dates.html" . }}
-  {{ with .Params.description }}<p class="article-lead">{{ . }}</p>{{ end }}
-  {{ with .Params.tags }}
-    <ul class="article-tags">
-      {{ range . }}
-        <li><a href="{{ "tags/" | relURL }}{{ . | urlize }}/">{{ . }}</a></li>
-      {{ end }}
-    </ul>
+  {{ with .Params.description }}
+    <hr class="article-rule" aria-hidden="true">
+    <p class="article-lead">{{ . }}</p>
+    <hr class="article-rule article-rule--after-lead" aria-hidden="true">
   {{ end }}
-  {{ with .Resources.GetMatch "top*" }}
+  {{ with .Params.tags }}
+    <div class="article-tags-row">
+      <span class="article-tags-label">tags:</span>
+      <ul class="article-tags">
+        {{ range . }}
+          <li><a href="{{ "tags/" | relURL }}{{ . | urlize }}/">{{ . }}</a></li>
+        {{ end }}
+      </ul>
+    </div>
+  {{ end }}
+  {{ $imgs := sort (.Resources.ByType "image") "Name" }}
+  {{ with index $imgs 0 }}
     <figure class="article-hero">
-      <img src="{{ .RelPermalink }}" alt="">
+      <img src="{{ .RelPermalink }}" alt="" loading="lazy">
     </figure>
   {{ end }}
   <div class="article-body" data-article-body>

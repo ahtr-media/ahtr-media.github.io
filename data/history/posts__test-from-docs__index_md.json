@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "date": "2026-06-06T14:29:54+09:00",
+    "author": "haruguchi",
+    "message": "Move posts to Page Bundle layout (content/posts/{slug}/index.md).",
+    "sha": "66f8a27e4467f82cd019377cee077b7c3e2cefba",
+    "url": "https://github.com/ahtr-media/ahtr-media.github.io/commit/66f8a27e4467f82cd019377cee077b7c3e2cefba"
+  },
+  {
+    "date": "2026-06-05T17:02:16+09:00",
+    "author": "haruguchi",
+    "message": "Phase 2: 本番サイト初期構成",
+    "sha": "638c79e05677878412a7336a7ad7adf3e0395076",
+    "url": "https://github.com/ahtr-media/ahtr-media.github.io/commit/638c79e05677878412a7336a7ad7adf3e0395076"
+  }
+]

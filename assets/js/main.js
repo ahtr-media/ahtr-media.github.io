@@ -41,7 +41,11 @@
 
       const activate = () => {
         if (card.classList.contains("is-open")) {
-          if (href) window.location.href = href;
+          if (href) {
+            window.location.href = href;
+            return;
+          }
+          setClosed(card);
           return;
         }
         openCard();
@@ -49,6 +53,8 @@
 
       card.addEventListener("click", (e) => {
         if (e.target.closest(".acard-icon")) return;
+        if (e.target.closest("a")) return;
+        if (!href && e.target.closest(".acard-body")) return;
         activate();
       });
       row.addEventListener("keydown", (e) => {

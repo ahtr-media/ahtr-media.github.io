@@ -1,12 +1,27 @@
 {{ $published := .Date }}
 {{ $updated := .Lastmod }}
 {{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
-<p class="adates">
-  <span class="adates-ver">{{ partial "page-version.html" . }}</span>
-  {{ if not $published.IsZero }}
-    <time class="adates-first" datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time>
+{{ $meta := partial "article-commit-meta.html" . }}
+{{ $showLatest := false }}
+{{ if and (not $published.IsZero) (not $updated.IsZero) }}
+  {{ if or (ne ($published.Format "2006-01-02") ($updated.Format "2006-01-02")) (ne $meta.firstVersion $meta.version) (ne $meta.firstUrl $meta.lastUrl) }}
+    {{ $showLatest = true }}
   {{ end }}
-  {{ if not $updated.IsZero }}
-    <time class="adates-last" datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time>
+{{ end }}
+<p class="adates">
+  {{ if not $published.IsZero }}
+    {{ with $meta.firstUrl }}
+      <a class="adates-pair adates-first adates-link" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $meta.firstVersion }}: <time datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time></a>
+    {{ else }}
+      <span class="adates-pair adates-first">{{ $meta.firstVersion }}: <time datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time></span>
+    {{ end }}
+  {{ end }}
+  {{ if $showLatest }}
+    <span class="adates-divider" aria-hidden="true">　</span>
+    {{ with $meta.lastUrl }}
+      <a class="adates-pair adates-last adates-link" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $meta.version }}: <time datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time></a>
+    {{ else }}
+      <span class="adates-pair adates-last">{{ $meta.version }}: <time datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time></span>
+    {{ end }}
   {{ end }}
 </p>

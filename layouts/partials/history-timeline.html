@@ -5,19 +5,58 @@
 {{ $hist := index site.Data.history $key }}
 
 {{ if and $hist (gt (len $hist) 0) }}
-<section class="article-history">
-  <h2 class="article-history-title">更新履歴</h2>
-  <ul class="article-history-list">
-    {{ range $hist }}
-      {{ $t := time .date }}
-      <li>
-        <a href="{{ .url }}" target="_blank" rel="noopener">
-          <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006 15:04" }}</time>
-          <span>{{ .author }}</span>
-          <span>{{ .message }}</span>
-        </a>
-      </li>
+  {{ $pageAuthor := .Params.author | default "" }}
+  {{ $sorted := sort $hist "date" "asc" }}
+  {{ $entries := slice }}
+  {{ $major := 0 }}
+  {{ $minor := 0 }}
+  {{ range $i, $h := $sorted }}
+    {{ if eq $i 0 }}
+      {{ $major = 1 }}
+      {{ $minor = 0 }}
+    {{ else if and $pageAuthor (eq ($h.author | default "") $pageAuthor) }}
+      {{ $major = add $major 1 }}
+      {{ $minor = 0 }}
+    {{ else }}
+      {{ $minor = add $minor 1 }}
     {{ end }}
-  </ul>
+    {{ $ver := printf "v%d.%d" $major $minor }}
+    {{ with $h.version }}{{ $ver = . }}{{ end }}
+    {{ $entries = $entries | append (merge $h (dict "version" $ver)) }}
+  {{ end }}
+  {{ $entries = sort $entries "date" "desc" }}
+  {{ $latest := index $entries 0 }}
+  {{ $latestTime := time $latest.date }}
+
+<section class="article-history-block" id="article-history">
+  <hr class="article-rule article-rule--full" aria-hidden="true">
+  <div class="article-history-card acard" data-card>
+    <div class="acard-row" tabindex="0">
+      <p class="article-hist-summary">
+        最終編集：<time datetime="{{ $latest.date }}">{{ $latestTime.Format "Jan 2, 2006" }}</time>
+      </p>
+      <button type="button" class="acard-icon" aria-expanded="false" aria-label="更新履歴を開く">+</button>
+    </div>
+    <div class="acard-body" hidden>
+      {{ range $i, $e := $entries }}
+        {{ $t := time $e.date }}
+        <div class="article-hist-revision">
+          <p class="article-hist-entry">
+            {{ with $e.url }}
+              <a class="article-hist-commit" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $e.version }}: {{ $t.Format "Jan 2, 2006" }}</a>
+            {{ else }}
+              <span class="article-hist-commit">{{ $e.version }}: {{ $t.Format "Jan 2, 2006" }}</span>
+            {{ end }}
+            {{ with $e.author }}<span class="article-hist-editor">（編集者：{{ . }}）</span>{{ end }}
+          </p>
+          <p class="article-hist-msg">{{ $e.message }}</p>
+        </div>
+        {{ if lt (add $i 1) (len $entries) }}
+          <div class="article-hist-sep" role="separator" aria-hidden="true">–</div>
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
+  <hr class="article-rule article-rule--full" aria-hidden="true">
 </section>
 {{ end }}

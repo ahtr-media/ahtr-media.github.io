@@ -24,6 +24,9 @@ jobs:
           submodules: true
           fetch-depth: 0   # ← git log で履歴を取るのに必要
 
+      - name: Fetch branch refs for cross-branch file history
+        run: git fetch origin --no-tags --prune '+refs/heads/*:refs/remotes/origin/*'
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
