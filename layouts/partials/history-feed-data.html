@@ -1,0 +1,28 @@
+{{ $feed := slice }}
+{{- range $p := site.RegularPages -}}
+  {{- with $p.File -}}
+    {{- $key := replace (replace .Path "/" "__") "." "_" -}}
+    {{- $hist := index site.Data.history $key -}}
+    {{- if $hist -}}
+      {{- $pageAuthor := $p.Params.author | default "" -}}
+      {{- $sorted := sort $hist "date" "asc" -}}
+      {{- $major := 0 -}}
+      {{- $minor := 0 -}}
+      {{- range $i, $h := $sorted -}}
+        {{- if eq $i 0 -}}
+          {{- $major = 1 -}}
+          {{- $minor = 0 -}}
+        {{- else if and $pageAuthor (eq ($h.author | default "") $pageAuthor) -}}
+          {{- $major = add $major 1 -}}
+          {{- $minor = 0 -}}
+        {{- else -}}
+          {{- $minor = add $minor 1 -}}
+        {{- end -}}
+        {{- $ver := printf "v%d.%d" $major $minor -}}
+        {{- with $h.version -}}{{ $ver = . }}{{- end -}}
+        {{- $feed = $feed | append (merge $h (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink "version" $ver)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{ return (sort $feed "date" "desc") }}

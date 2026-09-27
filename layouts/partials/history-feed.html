@@ -1,46 +1,36 @@
-{{ $feed := slice }}
-{{- range $p := site.RegularPages -}}
-  {{- with $p.File -}}
-    {{- $key := replace (replace .Path "/" "__") "." "_" -}}
-    {{- $hist := index site.Data.history $key -}}
-    {{- if $hist -}}
-      {{- $pageAuthor := $p.Params.author | default "" -}}
-      {{- $sorted := sort $hist "date" "asc" -}}
-      {{- $major := 0 -}}
-      {{- $minor := 0 -}}
-      {{- range $i, $h := $sorted -}}
-        {{- if eq $i 0 -}}
-          {{- $major = 1 -}}
-          {{- $minor = 0 -}}
-        {{- else if and $pageAuthor (eq ($h.author | default "") $pageAuthor) -}}
-          {{- $major = add $major 1 -}}
-          {{- $minor = 0 -}}
-        {{- else -}}
-          {{- $minor = add $minor 1 -}}
-        {{- end -}}
-        {{- $ver := printf "v%d.%d" $major $minor -}}
-        {{- with $h.version -}}{{ $ver = . }}{{- end -}}
-        {{- $feed = $feed | append (merge $h (dict "pageTitle" $p.Title "pageURL" $p.RelPermalink "version" $ver)) -}}
-      {{- end -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-{{ $feed = sort $feed "date" "desc" }}
+{{ $feed := partial "history-feed-data.html" . }}
+{{ $limit := 5 }}
+{{ $showAll := false }}
+{{ $showMore := false }}
+{{ if reflect.IsMap . }}
+  {{ if isset . "showAll" }}{{ $showAll = .showAll }}{{ end }}
+  {{ if isset . "showMore" }}{{ $showMore = .showMore }}{{ end }}
+  {{ if and (not $showAll) (isset . "limit") }}{{ $limit = .limit }}{{ end }}
+{{ end }}
+{{ $total := len $feed }}
+{{ $items := $feed }}
+{{ if not $showAll }}
+  {{ if gt $limit 0 }}
+    {{ $items = first $limit $feed }}
+  {{ end }}
+{{ end }}
 
 <section class="history-block" id="history">
   <header class="history-head">
     <p class="history-kicker">History</p>
     <h2>更新履歴</h2>
   </header>
-  {{ if gt (len $feed) 0 }}
+  {{ if gt $total 0 }}
     <ul class="history-list">
-      {{ range first 12 $feed }}
+      {{ range $items }}
         {{ $t := time .date }}
         <li class="history-item">
           <a href="{{ .pageURL }}">
             <div class="history-item-top">
               <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time>
-              <span class="history-item-title">{{ .pageTitle }}</span>
+              <span class="history-item-title-wrap">
+                <span class="history-item-title">{{ .pageTitle }}</span>
+              </span>
               <span class="history-chevron" aria-hidden="true">
                 <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 2.5 11.5 8 5 13.5"/>
@@ -58,6 +48,11 @@
         </li>
       {{ end }}
     </ul>
+    {{ if and $showMore (not $showAll) (gt $total $limit) }}
+      <p class="history-more">
+        <a class="history-more-link" href="{{ "history/" | relURL }}">すべての更新履歴を見る <span class="history-more-arrow" aria-hidden="true">→</span></a>
+      </p>
+    {{ end }}
   {{ else }}
     <p class="history-empty">まだ更新履歴がありません。</p>
   {{ end }}

@@ -271,8 +271,52 @@
     });
   }
 
+  function bindHistoryTitles() {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    document.querySelectorAll(".history-item-title-wrap").forEach((wrap) => {
+      const title = wrap.querySelector(".history-item-title");
+      if (!title) return;
+
+      const refresh = () => {
+        wrap.classList.remove("is-scrolling");
+        title.style.transition = "";
+        title.style.transform = "";
+        wrap.classList.toggle("is-truncated", title.scrollWidth > wrap.clientWidth + 1);
+      };
+      refresh();
+      window.addEventListener("resize", refresh);
+
+      wrap.addEventListener("mouseenter", () => {
+        if (reduced || !wrap.classList.contains("is-truncated")) return;
+        const dist = title.scrollWidth - wrap.clientWidth;
+        if (dist <= 0) return;
+        wrap.classList.add("is-scrolling");
+        requestAnimationFrame(() => {
+          const ms = Math.min(12000, Math.max(2800, dist * 40));
+          title.style.transition = `transform ${ms}ms linear`;
+          title.style.transform = `translateX(-${dist}px)`;
+        });
+      });
+
+      wrap.addEventListener("mouseleave", () => {
+        wrap.classList.remove("is-scrolling");
+        title.style.transition = "transform 180ms ease";
+        title.style.transform = "";
+        title.addEventListener(
+          "transitionend",
+          () => {
+            title.style.transition = "";
+          },
+          { once: true }
+        );
+      });
+    });
+  }
+
   bindCards();
   bindHomeCats();
   bindListPage();
   bindReviews();
+  bindHistoryTitles();
 })();

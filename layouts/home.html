@@ -3,7 +3,7 @@
   <h1 class="site-title-ja">いつも<br>わかっている<br>途中</h1>
 </header>
 
-{{ partial "history-feed.html" . }}
+{{ partial "history-feed.html" (dict "limit" 5 "showMore" true "showAll" false) }}
 
 {{ $snap := partial "featured-snap.html" . }}
 {{ with $snap }}
