@@ -1,0 +1,12 @@
+{{/* background: true の snap を YAML 上から最大 5 件 */}}
+{{ $out := slice }}
+{{ $n := 0 }}
+{{- with site.Data.snaps -}}
+  {{- range . -}}
+    {{- if and .background (lt $n 5) -}}
+      {{- $out = $out | append . -}}
+      {{- $n = add $n 1 -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{ return $out }}

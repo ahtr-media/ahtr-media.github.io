@@ -4,11 +4,11 @@
     <p class="site-title-en">Always Halfway<br>Through Realising</p>
     <p class="site-tagline">まちづくりにおける<br>葛藤・問い・実践の<br>循環</p>
   </div>
-  <div class="side-foot">
+  <div class="side-foot" data-snap-side-meta>
     {{ with .snap }}
-      {{ with .caption }}<p class="side-credit">{{ . }}</p>{{ end }}
-      {{ with .credit }}<p class="side-credit">{{ . }}</p>{{ end }}
-      {{ with .date }}<p class="side-credit">{{ . }}</p>{{ end }}
+      <p class="side-credit" data-snap-line="caption"{{ if not .caption }} hidden{{ end }}>{{ .caption }}</p>
+      <p class="side-credit" data-snap-line="credit"{{ if not .credit }} hidden{{ end }}>{{ .credit }}</p>
+      <p class="side-credit" data-snap-line="date"{{ if not .date }} hidden{{ end }}>{{ .date }}</p>
     {{ end }}
     <p class="side-copy">{{ .page.Site.Params.copyright }}</p>
   </div>

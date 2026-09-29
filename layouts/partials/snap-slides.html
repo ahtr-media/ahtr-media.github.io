@@ -1,0 +1,24 @@
+{{/* dict "list" $snaps "prefix" "site-bg"|"snap" */}}
+{{ $list := .list }}
+{{ $prefix := .prefix | default "site-bg" }}
+{{ range $i, $s := $list }}
+  {{ $url := printf "snaps/%s" $s.file | relURL }}
+  {{ if eq $prefix "site-bg" }}
+  <div
+    class="site-bg-slide{{ if eq $i 0 }} is-active{{ end }}"
+    style="--snap-image: url('{{ $url }}')"
+    data-snap-caption="{{ $s.caption | default "" }}"
+    data-snap-credit="{{ $s.credit | default "" }}"
+    data-snap-date="{{ $s.date | default "" }}"
+  ></div>
+  {{ else }}
+  <div class="snap-slide{{ if eq $i 0 }} is-active{{ end }}"
+    data-snap-index="{{ $i }}"
+    data-snap-caption="{{ $s.caption | default "" }}"
+    data-snap-credit="{{ $s.credit | default "" }}"
+    data-snap-date="{{ $s.date | default "" }}"
+  >
+    <img src="{{ $url }}" alt="{{ $s.alt | default $s.caption }}">
+  </div>
+  {{ end }}
+{{ end }}

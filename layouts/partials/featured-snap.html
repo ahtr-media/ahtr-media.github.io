@@ -1,8 +1,12 @@
 {{ $feat := false }}
-{{- with site.Data.snaps -}}
-  {{- range . -}}
-    {{- if .background -}}{{ $feat = . }}{{- end -}}
+{{ $bg := partial "background-snaps.html" . }}
+{{- if gt (len $bg) 0 -}}
+  {{- $feat = index $bg 0 -}}
+{{- else -}}
+  {{- with site.Data.snaps -}}
+    {{- if gt (len .) 0 -}}
+      {{- $feat = index . 0 -}}
+    {{- end -}}
   {{- end -}}
-  {{- if not $feat -}}{{ $feat = index . 0 }}{{- end -}}
 {{- end -}}
 {{ return $feat }}

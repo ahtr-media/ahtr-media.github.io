@@ -1,0 +1,8 @@
+{{/* スライドショー用リスト。background 指定がなければ featured 1 枚 */}}
+{{ $list := partial "background-snaps.html" . }}
+{{- if eq (len $list) 0 -}}
+  {{- with partial "featured-snap.html" . -}}
+    {{- $list = slice . -}}
+  {{- end -}}
+{{- end -}}
+{{ return $list }}

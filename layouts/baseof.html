@@ -3,9 +3,12 @@
 <head>
   {{ partial "head.html" . }}
 </head>
+{{ $snapList := partial "snap-display-list.html" . }}
 {{ $snap := partial "featured-snap.html" . }}
-<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}"{{ with $snap }} style="--snap-image: url('{{ printf "snaps/%s" .file | relURL }}')"{{ end }}>
-  <div class="site-bg" aria-hidden="true"></div>
+<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}">
+  <div class="site-bg" aria-hidden="true"{{ if gt (len $snapList) 1 }} data-snap-slideshow data-snap-interval="8000"{{ end }}>
+    {{ partial "snap-slides.html" (dict "list" $snapList "prefix" "site-bg") }}
+  </div>
   <div class="site-shell">
     {{ partial "sidebar-left.html" (dict "page" . "snap" $snap) }}
     <div class="col-center">

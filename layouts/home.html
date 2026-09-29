@@ -3,21 +3,30 @@
   <h1 class="site-title-ja">いつも<br>わかっている<br>途中</h1>
 </header>
 
-{{ partial "history-feed.html" (dict "limit" 5 "showMore" true "showAll" false) }}
+{{ partial "history-feed.html" (dict "limit" 5 "showMore" true "showAll" false "showNew" true) }}
 
-{{ $snap := partial "featured-snap.html" . }}
-{{ with $snap }}
+{{ $snapList := partial "snap-display-list.html" . }}
+{{ if gt (len $snapList) 0 }}
+{{ $first := index $snapList 0 }}
 <section class="snap" aria-label="スナップ写真">
   <header class="block-head block-head--light">
     <p class="block-kicker">Snap</p>
     <h2>スナップ写真</h2>
   </header>
-  <div class="snap-frame">
-    <img src="{{ printf "snaps/%s" .file | relURL }}" alt="{{ .alt | default .caption }}">
-    <p class="snap-caption">
-      {{ with .caption }}<span>{{ . }}</span>{{ end }}
-      {{ with .credit }}<span>{{ . }}</span>{{ end }}
-      {{ with .date }}<span>{{ . }}</span>{{ end }}
+  <div class="snap-frame"{{ if gt (len $snapList) 1 }} data-snap-carousel{{ end }}>
+    <div class="snap-slides">
+      {{ partial "snap-slides.html" (dict "list" $snapList "prefix" "snap") }}
+    </div>
+    {{ if gt (len $snapList) 1 }}
+    <div class="snap-controls">
+      <button type="button" class="snap-nav snap-nav--prev" aria-label="前のスナップ">&lt;</button>
+      <button type="button" class="snap-nav snap-nav--next" aria-label="次のスナップ">&gt;</button>
+    </div>
+    {{ end }}
+    <p class="snap-caption" data-snap-meta>
+      <span data-snap-line="caption"{{ if not $first.caption }} hidden{{ end }}>{{ $first.caption }}</span>
+      <span data-snap-line="credit"{{ if not $first.credit }} hidden{{ end }}>{{ $first.credit }}</span>
+      <span data-snap-line="date"{{ if not $first.date }} hidden{{ end }}>{{ $first.date }}</span>
     </p>
   </div>
 </section>
