@@ -11,6 +11,11 @@
 hugo server -D
 ```
 
+## ドキュメント
+
+- [コンテンツ運用ガイド（記事画像・スナップ）](docs/content-guide.md)
+- 記事ディレクトリの概要: [content/posts/README.md](content/posts/README.md)
+
 ## 関連
 
-- 計画・publish スクリプト・運用マニュアル: `~/Projects/ahtr`（ローカル、非公開）
+- 計画・publish スクリプト・Google Docs publish: `~/Projects/ahtr`（ローカル、非公開）
