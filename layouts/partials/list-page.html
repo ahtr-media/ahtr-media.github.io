@@ -1,6 +1,15 @@
 {{ $currentCat := "" }}
-{{ if and (eq .Kind "term") (eq .Data.Singular "category") }}{{ $currentCat = .Title }}{{ end }}
-<section class="list-page" data-list-page data-current-cat="{{ $currentCat }}">
+{{ $currentTag := "" }}
+{{ if eq .Kind "term" }}
+  {{ if or (eq .Data.Singular "category") (eq .Data.Plural "categories") }}{{ $currentCat = .Title }}{{ end }}
+  {{ if or (eq .Data.Singular "tag") (eq .Data.Plural "tags") (eq .Section "tags") }}{{ $currentTag = .Title }}{{ end }}
+{{ end }}
+<section
+  class="list-page"
+  data-list-page
+  data-current-cat="{{ $currentCat }}"
+  {{ with $currentTag }}data-current-tag="{{ . }}"{{ end }}
+>
   <div class="list-filters">
     <label class="list-label" for="cat-select">カテゴリーを選択する</label>
     <div class="list-select-wrap">
@@ -11,18 +20,18 @@
         {{ end }}
       </select>
     </div>
-    <button type="button" class="tag-toggle" data-tag-toggle aria-expanded="false">
+    <button type="button" class="tag-toggle" data-tag-toggle aria-expanded="{{ if $currentTag }}true{{ else }}false{{ end }}">
       タグで絞り込む
-      <span aria-hidden="true">+</span>
+      <span aria-hidden="true">{{ if $currentTag }}−{{ else }}+{{ end }}</span>
     </button>
-    <div class="tag-panel" data-tag-panel hidden>
+    <div class="tag-panel" data-tag-panel{{ if not $currentTag }} hidden{{ end }}>
       {{ $tags := site.Taxonomies.tags }}
       {{ if $tags }}
         <ul class="tag-list">
           {{ range $name, $pages := $tags }}
             <li>
               <label>
-                <input type="checkbox" data-tag-filter value="{{ $name }}">
+                <input type="checkbox" data-tag-filter value="{{ $name }}"{{ if eq $name $currentTag }} checked{{ end }}>
                 {{ $name }}
               </label>
             </li>

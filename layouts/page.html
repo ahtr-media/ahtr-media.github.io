@@ -18,21 +18,35 @@
       <span class="article-tags-label">tags:</span>
       <ul class="article-tags">
         {{ range . }}
-          <li><a href="{{ "tags/" | relURL }}{{ . | urlize }}/">{{ . }}</a></li>
+          <li><a href="{{ "posts/" | relURL }}?tag={{ . | urlquery }}">{{ . }}</a></li>
         {{ end }}
       </ul>
     </div>
   {{ end }}
-  {{ $imgs := sort (.Resources.ByType "image") "Name" }}
-  {{ with index $imgs 0 }}
-    <figure class="article-hero">
-      <img src="{{ .RelPermalink }}" alt="" loading="lazy">
+  {{ $page := . }}
+  {{ $topImg := $page.Resources.Get "top.jpg" }}
+  {{ $heroImg := $page.Resources.Get "hero.jpg" }}
+  {{ if and (not $topImg) $heroImg }}{{ $topImg = $heroImg }}{{ end }}
+  {{ if and (not $heroImg) $topImg }}{{ $heroImg = $topImg }}{{ end }}
+  {{ with $heroImg }}
+    {{ $meta := partial "bundle-image-caption.html" (dict "page" $page "name" .Name "captionParam" "hero_caption" "altParam" "hero_alt") }}
+    {{ $landscape := ge .Width .Height }}
+    <figure class="article-hero{{ if $landscape }} article-hero--landscape{{ else }} article-hero--portrait{{ end }}">
+      {{ if $landscape }}
+      <img src="{{ .RelPermalink }}" alt="{{ $meta.alt }}" loading="lazy" decoding="async">
+      {{ else }}
+      <div class="article-hero-media">
+        <img src="{{ .RelPermalink }}" alt="{{ $meta.alt }}" loading="lazy" decoding="async">
+      </div>
+      {{ end }}
+      {{ with $meta.caption }}<figcaption class="article-figure-caption">{{ . }}</figcaption>{{ end }}
     </figure>
   {{ end }}
   <div class="article-body" data-article-body>
     {{ .Content }}
   </div>
   {{ partial "history-timeline.html" . }}
+  {{ partial "related-posts.html" . }}
   {{ partial "reviews-data.html" . }}
 </article>
 {{ end }}

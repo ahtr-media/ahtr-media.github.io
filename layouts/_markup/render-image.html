@@ -1,0 +1,10 @@
+{{- $base := path.Base .Destination -}}
+{{- if or (eq $base "hero.jpg") (eq $base "top.jpg") -}}
+{{- else -}}
+<figure class="article-figure">
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" loading="lazy" decoding="async">
+  {{- with .Title -}}
+  <figcaption class="article-figure-caption">{{ . }}</figcaption>
+  {{- end -}}
+</figure>
+{{- end -}}

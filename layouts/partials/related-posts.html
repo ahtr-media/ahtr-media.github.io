@@ -1,0 +1,50 @@
+{{ $current := . }}
+{{ if .Draft }}{{ return }}{{ end }}
+{{ $cat := partial "cat.html" . }}
+{{ $tags := .Params.tags | default slice }}
+{{ $all := where site.RegularPages "Type" "posts" }}
+{{ $all = where $all "Permalink" "ne" $current.Permalink }}
+{{ if lt (len $all) 1 }}{{ return }}{{ end }}
+
+{{ $scratch := newScratch }}
+{{ $scratch.Set "picked" slice }}
+{{ $scratch.Set "seen" slice }}
+
+{{ range $all.ByDate.Reverse }}
+  {{ if ge (len ($scratch.Get "picked")) 3 }}{{ break }}{{ end }}
+  {{ $page := . }}
+  {{ $pCat := partial "cat.html" $page }}
+  {{ if ne $pCat $cat }}{{ continue }}{{ end }}
+  {{ if gt (len $tags) 0 }}
+    {{ $shared := false }}
+    {{ range $tags }}
+      {{ if in ($page.Params.tags | default slice) . }}{{ $shared = true }}{{ end }}
+    {{ end }}
+    {{ if not $shared }}{{ continue }}{{ end }}
+  {{ end }}
+  {{ $scratch.Add "picked" $page }}
+  {{ $scratch.Add "seen" $page.Permalink }}
+{{ end }}
+
+{{ $scratch.Set "need" (sub 3 (len ($scratch.Get "picked"))) }}
+{{ if gt ($scratch.Get "need") 0 }}
+  {{ range shuffle $all }}
+    {{ if le ($scratch.Get "need") 0 }}{{ break }}{{ end }}
+    {{ if in ($scratch.Get "seen") .Permalink }}{{ continue }}{{ end }}
+    {{ $scratch.Add "picked" . }}
+    {{ $scratch.Add "seen" .Permalink }}
+    {{ $scratch.Set "need" (sub ($scratch.Get "need") 1) }}
+  {{ end }}
+{{ end }}
+
+{{ $related := $scratch.Get "picked" }}
+{{ if lt (len $related) 1 }}{{ return }}{{ end }}
+
+<section class="article-related list-page" aria-labelledby="article-related-heading">
+  <h4 class="article-related-title" id="article-related-heading">関連記事</h4>
+  <div class="cat-cards" data-list-cards>
+    {{ range first 3 $related }}
+      {{ partial "article-card.html" . }}
+    {{ end }}
+  </div>
+</section>

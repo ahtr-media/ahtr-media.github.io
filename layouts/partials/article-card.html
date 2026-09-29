@@ -1,8 +1,9 @@
 {{ $cat := partial "cat.html" . }}
 {{ $href := .RelPermalink }}
 {{ $desc := .Params.description | default "" }}
-{{ $img := false }}
-{{ with .Resources.GetMatch "top*" }}{{ $img = .RelPermalink }}{{ end }}
+{{ $topImg := .Resources.Get "top.jpg" }}
+{{ $heroImg := .Resources.Get "hero.jpg" }}
+{{ if and (not $topImg) $heroImg }}{{ $topImg = $heroImg }}{{ end }}
 <article
   class="acard"
   data-card
@@ -21,9 +22,10 @@
   </div>
   <div class="acard-body" hidden>
     {{ with $desc }}<p class="acard-desc">{{ . }}</p>{{ end }}
-    {{ if $img }}
-      <figure class="acard-fig">
-        <img src="{{ $img }}" alt="">
+    {{ with $topImg }}
+      {{ $portrait := lt .Width .Height }}
+      <figure class="acard-fig{{ if $portrait }} acard-fig--portrait{{ end }}">
+        <img src="{{ .RelPermalink }}" alt="">
       </figure>
     {{ end }}
   </div>
