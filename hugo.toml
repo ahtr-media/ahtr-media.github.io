@@ -19,11 +19,6 @@ title = "いつもわかっている途中"
 
 ignoreFiles = ['(?i)readme\.md$']
 
-[[cascade]]
-  url = "/about/"
-  [cascade.target]
-    path = "/pages/about"
-
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
