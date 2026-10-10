@@ -1,66 +1,158 @@
 {{ define "main" }}
-<header class="hero-mobile">
-  <h1 class="site-title-ja">いつも<br>わかっている<br>途中</h1>
+{{ $snapList := partial "snap-display-list.html" . }}
+{{ $heroSnap := "" }}
+{{ with index $snapList 0 }}{{ $heroSnap = printf "snaps/%s" .file | relURL }}{{ end }}
+
+<header class="hero-mobile"{{ with $heroSnap }} style="--hero-image: url('{{ . }}')"{{ end }}>
+  <svg class="hero-logo" role="img" aria-label="いつもわかっている途中 Always Halfway Through Realising"><use href="#logo-hero"/></svg>
 </header>
 
-{{ partial "history-feed.html" (dict "limit" 5 "showMore" true "showAll" false "showNew" true) }}
+{{ $feed := partial "history-feed-data.html" . }}
+{{ $limit := 5 }}
+{{ $items := $feed }}
+{{ if gt (len $feed) $limit }}{{ $items = first $limit $feed }}{{ end }}
+<section class="history-home" id="history">
+  <header class="section-head section-head--dark">
+    <span class="section-head-mark" aria-hidden="true"></span>
+    <h2>更新履歴</h2>
+  </header>
+  {{ if gt (len $feed) 0 }}
+    <ul class="hcard-list">
+      {{ range $items }}
+        {{ $t := time .date }}
+        <li class="hcard">
+          <span class="hcard-tab" aria-hidden="true"></span>
+          <h3 class="hcard-title">{{ .pageTitle }}</h3>
+          <p class="hcard-label">Date Updated</p>
+          <p class="hcard-value">{{ .version }}: <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time></p>
+          {{ with .author }}
+            <p class="hcard-label">Updated by</p>
+            <p class="hcard-value">{{ . }}</p>
+          {{ end }}
+          {{ with .message }}
+            <p class="hcard-label">Change Summary</p>
+            <p class="hcard-summary">{{ . }}</p>
+          {{ end }}
+          <a class="hcard-read" href="{{ .pageURL }}">記事を読む</a>
+        </li>
+      {{ end }}
+    </ul>
+    <p class="history-all">
+      <a href="{{ "history/" | relURL }}">すべての更新履歴を見る</a>
+    </p>
+  {{ else }}
+    <p class="history-empty">まだ更新履歴がありません。</p>
+  {{ end }}
+</section>
 
-{{ $snapList := partial "snap-display-list.html" . }}
 {{ if gt (len $snapList) 0 }}
 {{ $first := index $snapList 0 }}
 <section class="snap" aria-label="スナップ写真">
-  <header class="block-head block-head--light">
-    <p class="block-kicker">Snap</p>
+  <header class="section-head section-head--dark">
+    <span class="section-head-mark" aria-hidden="true"></span>
     <h2>スナップ写真</h2>
   </header>
-  <div class="snap-frame"{{ if gt (len $snapList) 1 }} data-snap-carousel{{ end }}>
-    <div class="snap-slides">
-      {{ partial "snap-slides.html" (dict "list" $snapList "prefix" "snap") }}
+  <div class="snap-carousel"{{ if gt (len $snapList) 1 }} data-snap-carousel{{ end }}>
+    <div class="snap-frame">
+      <div class="snap-slides">
+        {{ partial "snap-slides.html" (dict "list" $snapList "prefix" "snap") }}
+      </div>
+      {{ if gt (len $snapList) 1 }}
+      <div class="snap-controls">
+        <button type="button" class="snap-nav snap-nav--prev" aria-label="前のスナップ">←</button>
+        <button type="button" class="snap-nav snap-nav--next" aria-label="次のスナップ">→</button>
+      </div>
+      {{ end }}
     </div>
-    {{ if gt (len $snapList) 1 }}
-    <div class="snap-controls">
-      <button type="button" class="snap-nav snap-nav--prev" aria-label="前のスナップ">&lt;</button>
-      <button type="button" class="snap-nav snap-nav--next" aria-label="次のスナップ">&gt;</button>
+    <div class="snap-caption-row" data-snap-meta>
+      <span class="snap-caption-rule" aria-hidden="true"></span>
+      <p class="snap-caption">
+        <span data-snap-line="caption"{{ if not $first.caption }} hidden{{ end }}>{{ $first.caption }}</span>
+        <span data-snap-line="credit"{{ if not $first.credit }} hidden{{ end }}>{{ $first.credit }}</span>
+        <span data-snap-line="date"{{ if not $first.date }} hidden{{ end }}>{{ $first.date }}</span>
+      </p>
+      <span class="snap-caption-rule" aria-hidden="true"></span>
     </div>
-    {{ end }}
-    <p class="snap-caption" data-snap-meta>
-      <span data-snap-line="caption"{{ if not $first.caption }} hidden{{ end }}>{{ $first.caption }}</span>
-      <span data-snap-line="credit"{{ if not $first.credit }} hidden{{ end }}>{{ $first.credit }}</span>
-      <span data-snap-line="date"{{ if not $first.date }} hidden{{ end }}>{{ $first.date }}</span>
-    </p>
   </div>
 </section>
 {{ end }}
 
-<section class="cat-block" data-home-cats>
-  <header class="block-head block-head--light">
-    <p class="block-kicker">Category</p>
-    <h2>カテゴリー</h2>
+{{ $posts := where site.RegularPages "Type" "posts" }}
+{{ $postCount := len $posts }}
+<section class="search-home" data-home-search>
+  <header class="section-head section-head--light">
+    <span class="section-head-mark" aria-hidden="true"></span>
+    <h2>記事検索</h2>
   </header>
-  <div class="cat-pills" role="tablist" aria-label="カテゴリー">
-    {{ $cats := .Site.Params.categories }}
-    {{ range $i, $c := $cats }}
-      <button
-        type="button"
-        class="cat-pill{{ if eq $i 0 }} is-active{{ end }}"
-        role="tab"
-        data-cat="{{ $c }}"
-        data-list="{{ "posts/" | relURL }}?cat={{ $c | urlquery }}"
-        aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}"
-      >{{ $c }}</button>
+  <div class="rule-split" aria-hidden="true"></div>
+
+  <h3 class="search-label">Category</h3>
+  <div class="rule-line" aria-hidden="true"></div>
+  <div class="filter-chips" data-filter-cats></div>
+  <div class="rule-split" aria-hidden="true"></div>
+
+  <h3 class="search-label">Tags</h3>
+  <div class="rule-line" aria-hidden="true"></div>
+  <div class="filter-chips" data-filter-tags></div>
+  <div class="rule-line" aria-hidden="true"></div>
+
+  <div class="search-meta">
+    <p class="search-count"><span class="search-count-mark" aria-hidden="true"></span><span data-search-count>{{ $postCount }}</span>件の記事</p>
+    <button type="button" class="search-sort" data-search-sort data-dir="new">新しい順</button>
+  </div>
+
+  <div class="scard-list" data-search-cards>
+    {{ range $posts.ByDate.Reverse }}
+      {{ $cat := partial "cat.html" . }}
+      {{ $meta := partial "article-commit-meta.html" . }}
+      {{ $published := .Date }}
+      {{ $updated := .Lastmod }}
+      {{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
+      <article
+        class="scard"
+        data-search-card
+        data-category="{{ $cat }}"
+        data-date="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}"
+        {{ with .Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
+      >
+        <span class="scard-tab" aria-hidden="true"></span>
+        {{ with $cat }}
+          <p class="scard-cat">{{ . }}</p>
+        {{ end }}
+        <h3 class="scard-title">{{ .Title }}</h3>
+        <hr class="scard-rule">
+        {{ with .Params.description }}
+          <p class="scard-kicker">Summary</p>
+          <p class="scard-text">{{ . }}</p>
+          <hr class="scard-rule">
+        {{ end }}
+        {{ with .Params.author }}
+          <p class="scard-kicker">Author</p>
+          <p class="scard-text">{{ . }}</p>
+          <hr class="scard-rule">
+        {{ end }}
+        {{ if not $published.IsZero }}
+          <p class="scard-kicker">Published</p>
+          <p class="scard-text">{{ $meta.firstVersion }}: <time datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time></p>
+          {{ if or (ne $meta.firstVersion $meta.version) (ne ($published.Format "2006-01-02") ($updated.Format "2006-01-02")) }}
+            <p class="scard-text">{{ $meta.version }}: <time datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time></p>
+          {{ end }}
+          <hr class="scard-rule">
+        {{ end }}
+        {{ with .Params.tags }}
+          <p class="scard-kicker">Tags</p>
+          <ul class="scard-tags">
+            {{ range . }}<li>{{ . }}</li>{{ end }}
+          </ul>
+          <hr class="scard-rule">
+        {{ end }}
+        <a class="scard-read" href="{{ .RelPermalink }}">記事を読む</a>
+      </article>
     {{ end }}
   </div>
-  <div class="cat-rule" aria-hidden="true"></div>
-  <div class="cat-cards">
-    {{ $posts := where site.RegularPages "Type" "posts" }}
-    {{ range $posts }}
-      {{ partial "article-card.html" . }}
-    {{ end }}
-  </div>
-  {{ with index $cats 0 }}
-    <p class="cat-more">
-      <a class="cat-more-link" data-cat-more href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">このカテゴリーを見る <span class="cat-more-arrow" aria-hidden="true">→</span></a>
-    </p>
-  {{ end }}
+
+  <p class="search-more" data-search-more hidden>
+    <a data-search-more-link href="{{ "posts/" | relURL }}">このカテゴリーを見る</a>
+  </p>
 </section>
 {{ end }}

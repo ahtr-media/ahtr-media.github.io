@@ -723,8 +723,174 @@
     });
   }
 
+  function bindSiteChrome() {
+    const menu = document.getElementById("site-menu");
+    const openBtn = document.querySelector("[data-menu-open]");
+    const search = document.querySelector("[data-home-search]");
+    if (!menu || !openBtn) return;
+
+    const closeBtns = [...menu.querySelectorAll("[data-menu-close]")];
+    const panel = menu.querySelector(".site-menu-panel");
+    const catInputs = [...menu.querySelectorAll("[data-menu-cat]")];
+    const tagInputs = [...menu.querySelectorAll("[data-menu-tag]")];
+    const cards = search ? [...search.querySelectorAll("[data-search-card]")] : [];
+    const cardsWrap = search ? search.querySelector("[data-search-cards]") : null;
+    const countEl = search ? search.querySelector("[data-search-count]") : null;
+    const sortBtn = search ? search.querySelector("[data-search-sort]") : null;
+    const catBox = search ? search.querySelector("[data-filter-cats]") : null;
+    const tagBox = search ? search.querySelector("[data-filter-tags]") : null;
+    const more = search ? search.querySelector("[data-search-more]") : null;
+    const moreLink = search ? search.querySelector("[data-search-more-link]") : null;
+    const homeHref = document.querySelector(".site-bar-title")?.getAttribute("href") || "/";
+    const state = { cats: [], tags: [], dir: "new" };
+    let lastFocus = null;
+
+    const closeMenu = () => {
+      menu.hidden = true;
+      openBtn.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("is-menu-open");
+      if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    };
+
+    const openMenu = () => {
+      catInputs.forEach((el) => { el.checked = state.cats.includes(el.value); });
+      tagInputs.forEach((el) => { el.checked = state.tags.includes(el.value); });
+      lastFocus = document.activeElement;
+      menu.hidden = false;
+      openBtn.setAttribute("aria-expanded", "true");
+      document.body.classList.add("is-menu-open");
+      menu.querySelector(".site-bar--menu [data-menu-close]")?.focus();
+    };
+
+    const chip = (label, kind) => {
+      const el = document.createElement("span");
+      el.className = "filter-chip";
+      const text = document.createElement("span");
+      text.className = "filter-chip-label";
+      text.textContent = label;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "filter-chip-x";
+      btn.setAttribute("aria-label", label + "を外す");
+      btn.textContent = "×";
+      btn.addEventListener("click", () => {
+        const key = kind === "cat" ? "cats" : "tags";
+        state[key] = state[key].filter((v) => v !== label);
+        applySearch();
+        writeParams();
+      });
+      el.append(text, btn);
+      return el;
+    };
+
+    const applySearch = () => {
+      if (!search) return;
+      const list = [...cards];
+      list.sort((a, b) => {
+        const da = a.getAttribute("data-date") || "";
+        const db = b.getAttribute("data-date") || "";
+        return state.dir === "old" ? da.localeCompare(db) : db.localeCompare(da);
+      });
+      if (cardsWrap) list.forEach((el) => cardsWrap.appendChild(el));
+      let visible = 0;
+      cards.forEach((card) => {
+        const cat = card.getAttribute("data-category") || "";
+        const tags = (card.getAttribute("data-tags") || "").split(/\s+/).filter(Boolean);
+        const catOk = state.cats.length === 0 || state.cats.includes(cat);
+        const tagOk = state.tags.length === 0 || state.tags.every((t) => tags.includes(t));
+        const ok = catOk && tagOk;
+        card.classList.toggle("is-filtered-out", !ok);
+        if (ok) visible += 1;
+      });
+      if (countEl) countEl.textContent = String(visible);
+      if (sortBtn) sortBtn.textContent = state.dir === "old" ? "古い順" : "新しい順";
+      if (catBox) catBox.replaceChildren(...state.cats.map((name) => chip(name, "cat")));
+      if (tagBox) tagBox.replaceChildren(...state.tags.map((name) => chip(name, "tag")));
+      if (more && moreLink) {
+        const one = state.cats.length === 1;
+        more.hidden = !one;
+        if (one) {
+          const base = moreLink.getAttribute("href").split("?")[0];
+          moreLink.setAttribute("href", base + "?cat=" + encodeURIComponent(state.cats[0]));
+        }
+      }
+    };
+
+    const writeParams = () => {
+      if (!search) return;
+      const url = new URL(window.location.href);
+      url.searchParams.delete("cat");
+      url.searchParams.delete("tag");
+      url.searchParams.delete("sort");
+      state.cats.forEach((name) => url.searchParams.append("cat", name));
+      state.tags.forEach((name) => url.searchParams.append("tag", name));
+      if (state.dir === "old") url.searchParams.set("sort", "old");
+      history.replaceState({}, "", url);
+    };
+
+    if (search) {
+      const params = new URLSearchParams(window.location.search);
+      state.cats = params.getAll("cat").filter(Boolean);
+      state.tags = params.getAll("tag").filter(Boolean);
+      if (params.get("sort") === "old") state.dir = "old";
+      applySearch();
+      sortBtn?.addEventListener("click", () => {
+        state.dir = state.dir === "new" ? "old" : "new";
+        applySearch();
+        writeParams();
+      });
+    }
+
+    const syncBar = () => {
+      document.body.classList.toggle("is-bar-solid", window.scrollY > 24);
+    };
+    syncBar();
+    window.addEventListener("scroll", syncBar, { passive: true });
+
+    openBtn.addEventListener("click", openMenu);
+    closeBtns.forEach((btn) => btn.addEventListener("click", closeMenu));
+    menu.querySelector("[data-menu-apply]")?.addEventListener("click", () => {
+      const cats = catInputs.filter((el) => el.checked).map((el) => el.value);
+      const tags = tagInputs.filter((el) => el.checked).map((el) => el.value);
+      if (!search) {
+        const url = new URL(homeHref, window.location.origin);
+        cats.forEach((name) => url.searchParams.append("cat", name));
+        tags.forEach((name) => url.searchParams.append("tag", name));
+        window.location.href = url.toString();
+        return;
+      }
+      state.cats = cats;
+      state.tags = tags;
+      applySearch();
+      writeParams();
+      closeMenu();
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (menu.hidden) return;
+      if (ev.key === "Escape") {
+        ev.preventDefault();
+        closeMenu();
+        return;
+      }
+      if (ev.key !== "Tab" || !panel) return;
+      const focusable = [...panel.querySelectorAll("a, button, input")].filter((el) => !el.disabled);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (ev.shiftKey && document.activeElement === first) {
+        ev.preventDefault();
+        last.focus();
+      } else if (!ev.shiftKey && document.activeElement === last) {
+        ev.preventDefault();
+        first.focus();
+      }
+    });
+  }
+
   bindCards();
   bindHomeCats();
+  bindSiteChrome();
   bindListPage();
   bindArticleLinks();
   bindReviews();
