@@ -6,7 +6,7 @@
 # credit      撮影者・権利表記。空なら出さない
 # date        撮影年月。空なら出さない
 # alt         読み上げ・画像オフ用。caption と同じでよい
-# background  true の 1 枚を PC 背景にする（複数 true なら後ろが勝つ）
+# background  true を上から最大 5 枚、PC 背景にする。間隔は約 8 秒（layouts/baseof.html の data-snap-interval="8000"）
 # credit / source にコロンを含むときは引用符で囲む（YAML の制約）
 
 - file: philipp-fog-forest.jpg
