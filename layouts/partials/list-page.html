@@ -4,63 +4,39 @@
   {{ if or (eq .Data.Singular "category") (eq .Data.Plural "categories") }}{{ $currentCat = .Title }}{{ end }}
   {{ if or (eq .Data.Singular "tag") (eq .Data.Plural "tags") (eq .Section "tags") }}{{ $currentTag = .Title }}{{ end }}
 {{ end }}
+{{ $posts := where site.RegularPages "Type" "posts" }}
+{{ $postCount := len $posts }}
 <section
-  class="list-page"
-  data-list-page
-  data-current-cat="{{ $currentCat }}"
+  class="search-home list-page"
+  data-home-search
+  {{ with $currentCat }}data-current-cat="{{ . }}"{{ end }}
   {{ with $currentTag }}data-current-tag="{{ . }}"{{ end }}
 >
-  <div class="list-filters">
-    <label class="list-label" for="cat-select">カテゴリーを選択する</label>
-    <div class="list-select-wrap">
-      <select id="cat-select" class="list-select" data-cat-select>
-        <option value="">すべて</option>
-        {{ range site.Params.categories }}
-          <option value="{{ . }}" {{ if eq . $currentCat }}selected{{ end }}>{{ . }}</option>
-        {{ end }}
-      </select>
-    </div>
-    <button type="button" class="tag-toggle" data-tag-toggle aria-expanded="{{ if $currentTag }}true{{ else }}false{{ end }}">
-      タグで絞り込む
-      <span aria-hidden="true">{{ if $currentTag }}−{{ else }}+{{ end }}</span>
-    </button>
-    <div class="tag-panel" data-tag-panel{{ if not $currentTag }} hidden{{ end }}>
-      {{ $tags := site.Taxonomies.tags }}
-      {{ if $tags }}
-        <ul class="tag-list">
-          {{ range $name, $pages := $tags }}
-            <li>
-              <label>
-                <input type="checkbox" data-tag-filter value="{{ $name }}"{{ if eq $name $currentTag }} checked{{ end }}>
-                {{ $name }}
-              </label>
-            </li>
-          {{ end }}
-        </ul>
-      {{ else }}
-        <p class="tag-empty">タグはまだありません。</p>
-      {{ end }}
-    </div>
+  <header class="section-head section-head--light">
+    <span class="section-head-mark" aria-hidden="true"></span>
+    <h2>記事検索</h2>
+  </header>
+  <div class="rule-split" aria-hidden="true"></div>
+
+  <h3 class="search-label">Category</h3>
+  <div class="rule-line" aria-hidden="true"></div>
+  <div class="filter-chips" data-filter-cats></div>
+  <div class="rule-line" aria-hidden="true"></div>
+  <div class="rule-split" aria-hidden="true"></div>
+
+  <h3 class="search-label">Tags</h3>
+  <div class="rule-line" aria-hidden="true"></div>
+  <div class="filter-chips" data-filter-tags></div>
+  <div class="rule-line" aria-hidden="true"></div>
+
+  <div class="search-meta">
+    <p class="search-count"><span class="search-count-mark" aria-hidden="true"></span><span><span data-search-count>{{ $postCount }}</span>件の記事</span></p>
+    <button type="button" class="search-sort" data-search-sort data-dir="new"><span data-search-sort-label>新しい順</span><span class="search-sort-mark" data-search-sort-mark aria-hidden="true">▼</span></button>
   </div>
 
-  {{ $pages := where site.RegularPages "Type" "posts" }}
-  {{ if eq .Kind "term" }}
-    {{ $pages = .Pages }}
-  {{ end }}
-
-  <div class="list-meta">
-    <p class="list-count"><span class="list-count-num" data-list-count>{{ len $pages }}</span><span class="list-count-unit">記事</span></p>
-    <div class="list-sort-wrap">
-      <select class="list-sort" data-list-sort aria-label="並び順">
-        <option value="new">新しい順</option>
-        <option value="old">古い順</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="cat-cards" data-list-cards>
-    {{ range $pages.ByDate.Reverse }}
-      {{ partial "article-card.html" . }}
+  <div class="scard-list" data-search-cards>
+    {{ range $posts.ByDate.Reverse }}
+      {{ partial "search-card.html" (dict "page" . "search" true) }}
     {{ end }}
   </div>
 </section>

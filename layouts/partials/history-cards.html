@@ -1,0 +1,26 @@
+<ul class="hcard-list">
+  {{ $newestDay := .newestDay }}
+  {{ range .items }}
+    {{ $t := time .date }}
+    <li class="hcard">
+      <span class="hcard-tab" aria-hidden="true"></span>
+      <h3 class="hcard-title" lang="ja"><a href="{{ .pageURL }}">{{ .pageTitle }}</a></h3>
+      <p class="hcard-label">Date Updated</p>
+      <p class="hcard-value hcard-updated">
+        {{ if and $newestDay (eq ($t.Format "2006-01-02") $newestDay) }}
+          <span class="history-item-new">NEW</span>
+        {{ end }}
+        <span>{{ .version }}: <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time></span>
+      </p>
+      {{ with .author }}
+        <p class="hcard-label">Updated by</p>
+        <p class="hcard-value">{{ . }}</p>
+      {{ end }}
+      {{ with .message }}
+        <p class="hcard-label">Change Summary</p>
+        <p class="hcard-summary" lang="ja">{{ . }}</p>
+      {{ end }}
+      <a class="hcard-read" href="{{ .pageURL }}">記事を読む</a>
+    </li>
+  {{ end }}
+</ul>

@@ -311,23 +311,46 @@
       activeMark = null;
     };
 
+    const reviewDate = (iso) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso.slice(0, 10);
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+    };
+
     const fill = (el, comment, onClose) => {
       el.replaceChildren();
-      const head = document.createElement("div");
-      head.className = "review-head";
-      const authorEl = document.createElement("span");
-      authorEl.className = "review-author";
-      authorEl.textContent = (comment.author && comment.author.display_name) || "";
-      const headRight = document.createElement("div");
-      headRight.className = "review-head-right";
-      const when = comment.created_time ? comment.created_time.slice(0, 10) : "";
-      if (when) {
+      const bodyEl = document.createElement("p");
+      bodyEl.className = "review-body";
+      bodyEl.textContent = comment.content || "";
+      el.append(bodyEl);
+
+      const rule = document.createElement("hr");
+      rule.className = "review-rule";
+      el.append(rule);
+
+      if (comment.created_time) {
+        const dateLabel = document.createElement("p");
+        dateLabel.className = "review-kicker";
+        dateLabel.textContent = "Date Commented";
         const dateEl = document.createElement("time");
-        dateEl.className = "review-date";
-        dateEl.dateTime = when;
-        dateEl.textContent = when;
-        headRight.append(dateEl);
+        dateEl.className = "review-value";
+        dateEl.dateTime = comment.created_time.slice(0, 10);
+        dateEl.textContent = reviewDate(comment.created_time);
+        el.append(dateLabel, dateEl);
       }
+
+      const name = (comment.author && comment.author.display_name) || "";
+      if (name) {
+        const byLabel = document.createElement("p");
+        byLabel.className = "review-kicker";
+        byLabel.textContent = "Commented by";
+        const authorEl = document.createElement("p");
+        authorEl.className = "review-value";
+        authorEl.textContent = name;
+        el.append(byLabel, authorEl);
+      }
+
       const closeBtn = document.createElement("button");
       closeBtn.type = "button";
       closeBtn.className = "review-close";
@@ -338,37 +361,25 @@
         e.stopPropagation();
         onClose();
       });
-      headRight.append(closeBtn);
-      head.append(authorEl, headRight);
-      const bodyEl = document.createElement("div");
-      bodyEl.className = "review-body";
-      bodyEl.textContent = comment.content || "";
-      el.append(head, bodyEl);
+      el.append(closeBtn);
     };
 
     const openPopup = (comment, mark) => {
       fill(popup, comment, closeReview);
       popup.classList.add("is-open");
-      requestAnimationFrame(() => {
-        const rect = mark.getBoundingClientRect();
-        const w = popup.offsetWidth || Math.min(320, window.innerWidth - 32);
-        popup.style.top = `${rect.bottom + 8}px`;
-        popup.style.left = `${Math.max(16, Math.min(rect.left, window.innerWidth - w - 16))}px`;
-      });
-    };
-
-    const openMobilePanel = (comment, mark) => {
-      fill(panel, comment, closeReview);
-      const flow = mark.closest("[data-article-body]");
-      panel.classList.add("is-open", "is-mobile-fixed");
-      requestAnimationFrame(() => {
-        const markRect = mark.getBoundingClientRect();
-        const flowRect = flow ? flow.getBoundingClientRect() : markRect;
-        panel.style.top = `${markRect.bottom + 8}px`;
-        panel.style.left = `${flowRect.left}px`;
-        panel.style.width = `${flowRect.width}px`;
-        panel.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      });
+      const col = mark.closest(".col-center") || document.body;
+      const colRect = col.getBoundingClientRect();
+      const w = Math.round(Math.min(colRect.width * 0.74, 22 * 16));
+      popup.style.width = `${w}px`;
+      const h = popup.offsetHeight;
+      const rect = mark.getBoundingClientRect();
+      let left = colRect.left + (colRect.width - w) / 2;
+      let top = rect.bottom - 10;
+      const margin = 12;
+      left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+      top = Math.max(margin, Math.min(top, window.innerHeight - h - 22));
+      popup.style.left = `${left}px`;
+      popup.style.top = `${top}px`;
     };
 
     const openReview = (comment, mark) => {
@@ -382,17 +393,6 @@
       closeReview();
       activeMark = mark;
       mark.classList.add("is-active");
-
-      if (desktop()) {
-        openPopup(comment, mark);
-        return;
-      }
-
-      if (mark.closest("[data-article-body]")) {
-        openMobilePanel(comment, mark);
-        return;
-      }
-
       openPopup(comment, mark);
     };
 
@@ -413,6 +413,84 @@
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
       closeReview();
+    });
+  }
+
+  function bindArticleNav() {
+    const bar = document.querySelector(".col-center > .site-bar .site-bar-title[data-article-nav]");
+    const titleEl = document.querySelector("[data-article] .scard-title");
+    if (!bar || !titleEl) return;
+    const enLabel = bar.querySelector(".site-bar-title-label--en");
+    const artLabel = bar.querySelector(".site-bar-title-label--article");
+    const track = bar.querySelector(".site-bar-title-track");
+    const text = bar.querySelector(".site-bar-title-text");
+    const endEl = document.querySelector(".article-history-block");
+    const barEl = bar.closest(".site-bar");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let showing = false;
+
+    const refreshTrunc = () => {
+      if (!track || !text) return;
+      track.classList.remove("is-scrolling");
+      text.style.transition = "";
+      text.style.transform = "";
+      void track.offsetWidth;
+      track.classList.toggle("is-truncated", text.scrollWidth > track.clientWidth + 1);
+    };
+
+    const update = () => {
+      const barBottom = barEl.getBoundingClientRect().bottom;
+      const titleBottom = titleEl.getBoundingClientRect().bottom;
+      const start = window.scrollY + titleBottom - barBottom;
+      let end = start;
+      if (endEl) end = window.scrollY + endEl.getBoundingClientRect().top - barBottom;
+      const span = end - start;
+      const progress = span > 1 ? Math.min(1, Math.max(0, (window.scrollY - start) / span)) : 0;
+      bar.style.setProperty("--read-progress", `${progress * 100}%`);
+
+      const next = titleBottom <= barBottom + 0.5;
+      if (next === showing) return;
+      showing = next;
+      bar.classList.toggle("is-article-title", showing);
+      if (enLabel) enLabel.setAttribute("aria-hidden", showing ? "true" : "false");
+      if (artLabel) artLabel.setAttribute("aria-hidden", showing ? "false" : "true");
+      if (showing) refreshTrunc();
+      else if (track && text) {
+        track.classList.remove("is-scrolling", "is-truncated");
+        text.style.transition = "";
+        text.style.transform = "";
+      }
+    };
+
+    if (track && text) {
+      const startScroll = () => {
+        if (!showing || reduced || !track.classList.contains("is-truncated")) return;
+        const dist = text.scrollWidth - track.clientWidth;
+        if (dist <= 0) return;
+        track.classList.add("is-scrolling");
+        requestAnimationFrame(() => {
+          const ms = Math.min(12000, Math.max(2800, dist * 40));
+          text.style.transition = `transform ${ms}ms linear`;
+          text.style.transform = `translateX(-${dist}px)`;
+        });
+      };
+      const stopScroll = () => {
+        track.classList.remove("is-scrolling");
+        text.style.transition = "transform 180ms ease";
+        text.style.transform = "";
+        text.addEventListener("transitionend", () => {
+          text.style.transition = "";
+        }, { once: true });
+      };
+      bar.addEventListener("mouseenter", startScroll);
+      bar.addEventListener("mouseleave", stopScroll);
+    }
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", () => {
+      update();
+      if (showing) refreshTrunc();
     });
   }
 
@@ -537,7 +615,16 @@
       track.insertBefore(cloneNode(slides[count - 1]), slides[0]);
       track.appendChild(cloneNode(slides[0]));
 
-      const frameW = () => carouselRoot.clientWidth || 1;
+      const frame = carouselRoot.querySelector(".snap-frame");
+      const frameW = () => {
+        const raw = frame ? frame.getBoundingClientRect().width : carouselRoot.clientWidth;
+        const w = Math.ceil(raw) + 1;
+        track.querySelectorAll(".snap-slide").forEach((slide) => {
+          slide.style.flexBasis = `${w}px`;
+          slide.style.width = `${w}px`;
+        });
+        return w > 1 ? w : 1;
+      };
       /** 0=末尾クローン, 1..count=本物, count+1=先頭クローン */
       let posIndex = activeIdx + 1;
 
@@ -737,6 +824,8 @@
     const cardsWrap = search ? search.querySelector("[data-search-cards]") : null;
     const countEl = search ? search.querySelector("[data-search-count]") : null;
     const sortBtn = search ? search.querySelector("[data-search-sort]") : null;
+    const sortLabel = sortBtn ? sortBtn.querySelector("[data-search-sort-label]") : null;
+    const sortMark = sortBtn ? sortBtn.querySelector("[data-search-sort-mark]") : null;
     const catBox = search ? search.querySelector("[data-filter-cats]") : null;
     const tagBox = search ? search.querySelector("[data-filter-tags]") : null;
     const more = search ? search.querySelector("[data-search-more]") : null;
@@ -803,7 +892,8 @@
         if (ok) visible += 1;
       });
       if (countEl) countEl.textContent = String(visible);
-      if (sortBtn) sortBtn.textContent = state.dir === "old" ? "古い順" : "新しい順";
+      if (sortLabel) sortLabel.textContent = state.dir === "old" ? "古い順" : "新しい順";
+      if (sortMark) sortMark.textContent = state.dir === "old" ? "▲" : "▼";
       if (catBox) catBox.replaceChildren(...state.cats.map((name) => chip(name, "cat")));
       if (tagBox) tagBox.replaceChildren(...state.tags.map((name) => chip(name, "tag")));
       if (more && moreLink) {
@@ -830,8 +920,19 @@
 
     if (search) {
       const params = new URLSearchParams(window.location.search);
-      state.cats = params.getAll("cat").filter(Boolean);
-      state.tags = params.getAll("tag").filter(Boolean);
+      const hasFilter = params.has("cat") || params.has("tag");
+      const presetCat = search.getAttribute("data-current-cat");
+      const presetTag = search.getAttribute("data-current-tag");
+      if (hasFilter) {
+        state.cats = params.getAll("cat").filter(Boolean);
+        state.tags = params.getAll("tag").filter(Boolean);
+      } else if (presetCat || presetTag) {
+        state.cats = presetCat ? [presetCat] : [];
+        state.tags = presetTag ? [presetTag] : [];
+      } else {
+        state.cats = ["はじめに"];
+        state.tags = ["葛藤"];
+      }
       if (params.get("sort") === "old") state.dir = "old";
       applySearch();
       sortBtn?.addEventListener("click", () => {
@@ -841,11 +942,30 @@
       });
     }
 
+    const homeBar = document.querySelector(".is-home .col-center > .site-bar");
+    const heroLogo = document.querySelector(".hero-logo");
+    const barQuery = window.matchMedia("(max-width: 59.99rem)");
     const syncBar = () => {
-      document.body.classList.toggle("is-bar-solid", window.scrollY > 24);
+      if (!homeBar) return;
+      if (!barQuery.matches) {
+        homeBar.style.removeProperty("--bar-top");
+        homeBar.style.removeProperty("--bar-bottom");
+        return;
+      }
+      const barBottom = homeBar.getBoundingClientRect().bottom;
+      const range = heroLogo
+        ? Math.max(1, window.scrollY + heroLogo.getBoundingClientRect().bottom - barBottom)
+        : 120;
+      const t = Math.min(1, Math.max(0, window.scrollY / range));
+      const top = Math.min(1, t / 0.72);
+      const bottom = Math.max(0, (t - 0.28) / 0.72);
+      homeBar.style.setProperty("--bar-top", top.toFixed(3));
+      homeBar.style.setProperty("--bar-bottom", bottom.toFixed(3));
     };
     syncBar();
     window.addEventListener("scroll", syncBar, { passive: true });
+    window.addEventListener("resize", syncBar);
+    barQuery.addEventListener("change", syncBar);
 
     openBtn.addEventListener("click", openMenu);
     closeBtns.forEach((btn) => btn.addEventListener("click", closeMenu));
@@ -888,12 +1008,27 @@
     });
   }
 
+  function bindHistoryAccordion() {
+    const btn = document.querySelector("[data-history-toggle]");
+    const panel = document.getElementById("article-history-panel");
+    if (!btn || !panel) return;
+    const plus = btn.querySelector(".article-updated-plus");
+    btn.addEventListener("click", () => {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+      panel.hidden = open;
+      if (plus) plus.textContent = open ? "+" : "×";
+    });
+  }
+
   bindCards();
   bindHomeCats();
   bindSiteChrome();
   bindListPage();
   bindArticleLinks();
   bindReviews();
+  bindHistoryAccordion();
+  bindArticleNav();
   bindHistoryTitles();
   bindSnapSlideshow();
   bindSnapCarousel();

@@ -5,7 +5,7 @@
 </head>
 {{ $snapList := partial "snap-display-list.html" . }}
 {{ $snap := partial "featured-snap.html" . }}
-<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}">
+<body class="{{ if .IsHome }}is-home{{ else }}is-inner{{ end }}{{ if eq .Section "history" }} is-history{{ end }}">
   <div class="site-bg" aria-hidden="true"{{ if gt (len $snapList) 1 }} data-snap-slideshow data-snap-interval="8000"{{ end }}>
     {{ partial "snap-slides.html" (dict "list" $snapList "prefix" "site-bg") }}
   </div>
@@ -17,7 +17,18 @@
     {{ partial "sidebar-left.html" (dict "page" . "snap" $snap) }}
     <div class="col-center">
       <div class="site-bar">
-        <a class="site-bar-title" href="{{ "/" | relURL }}">Always Halfway Through Realising</a>
+        <a class="site-bar-title" href="{{ "/" | relURL }}"{{ if .IsPage }} data-article-nav style="--read-progress: 0%"{{ end }}>
+          {{- if .IsPage -}}
+            <span class="site-bar-title-label site-bar-title-label--en">Always Halfway Through Realising</span>
+            <span class="site-bar-title-label site-bar-title-label--article" aria-hidden="true">
+              <span class="site-bar-title-track">
+                <span class="site-bar-title-text" lang="ja">{{ .Title }}</span>
+              </span>
+            </span>
+          {{- else -}}
+            Always Halfway Through Realising
+          {{- end -}}
+        </a>
         <button type="button" class="site-bar-btn" data-menu-open aria-expanded="false" aria-controls="site-menu">MENU</button>
       </div>
       {{ block "main" . }}{{ end }}
@@ -73,6 +84,8 @@
       </div>
     </div>
   </div>
+  {{ $phrase := resources.Get "js/phrase-break.js" | minify | fingerprint }}
+  <script src="{{ $phrase.RelPermalink }}" defer></script>
   {{ $js := resources.Get "js/main.js" | minify | fingerprint }}
   <script src="{{ $js.RelPermalink }}" defer></script>
 </body>

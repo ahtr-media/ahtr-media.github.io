@@ -40,11 +40,11 @@
 {{ $related := $scratch.Get "picked" }}
 {{ if lt (len $related) 1 }}{{ return }}{{ end }}
 
-<section class="article-related list-page" aria-labelledby="article-related-heading">
-  <h4 class="article-related-title" id="article-related-heading">関連記事</h4>
-  <div class="cat-cards" data-list-cards>
+<section class="article-related" aria-labelledby="article-related-heading">
+  <h2 class="article-related-title" id="article-related-heading">関連記事</h2>
+  <div class="scard-list">
     {{ range first 3 $related }}
-      {{ partial "article-card.html" . }}
+      {{ partial "search-card.html" (dict "page" . "search" false) }}
     {{ end }}
   </div>
 </section>

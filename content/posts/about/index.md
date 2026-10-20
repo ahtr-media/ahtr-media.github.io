@@ -5,6 +5,8 @@ date: 2026-06-27
 lastmod: 2026-06-27
 draft: false
 category: はじめに
+tags:
+  - 葛藤
 description: 『いつもわかっている途中』について紹介するページです。
 hero_alt: "代替テキスト"
 url: /about/

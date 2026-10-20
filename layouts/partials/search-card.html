@@ -1,0 +1,72 @@
+{{ $page := .page }}
+{{ $search := .search }}
+{{ $self := .self }}
+{{ $cat := partial "cat.html" $page }}
+{{ $meta := partial "article-commit-meta.html" $page }}
+{{ $published := $page.Date }}
+{{ $updated := $page.Lastmod }}
+{{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
+<article
+  class="scard"
+  {{ if $search }}
+    data-search-card
+    data-category="{{ $cat }}"
+    data-date="{{ $page.Date.Format "2006-01-02T15:04:05Z07:00" }}"
+    {{ with $page.Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
+  {{ end }}
+>
+  <span class="scard-tab" aria-hidden="true"></span>
+  {{ with $cat }}
+    <p class="scard-cat">
+      {{ if $self }}
+        <a href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">{{ . }}</a>
+      {{ else }}
+        {{ . }}
+      {{ end }}
+    </p>
+  {{ end }}
+  {{ if $self }}
+    <h1 class="scard-title" lang="ja">{{ $page.Title }}</h1>
+  {{ else }}
+    <h3 class="scard-title" lang="ja"><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
+  {{ end }}
+  <hr class="scard-rule">
+  {{ with $page.Params.description }}
+    <p class="scard-kicker">Summary</p>
+    <p class="scard-text">{{ . }}</p>
+    <hr class="scard-rule">
+  {{ end }}
+  {{ with $page.Params.author }}
+    <p class="scard-kicker">Author</p>
+    <p class="scard-text">{{ . }}</p>
+    <hr class="scard-rule">
+  {{ end }}
+  {{ if not $published.IsZero }}
+    <p class="scard-kicker">Published</p>
+    <p class="scard-text">{{ $meta.firstVersion }}: <time datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time></p>
+    {{ if or (ne $meta.firstVersion $meta.version) (ne ($published.Format "2006-01-02") ($updated.Format "2006-01-02")) }}
+      <p class="scard-text">{{ $meta.version }}: <time datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time></p>
+    {{ end }}
+    {{ if or (not $self) $page.Params.tags }}
+      <hr class="scard-rule">
+    {{ end }}
+  {{ end }}
+  {{ with $page.Params.tags }}
+    <p class="scard-kicker">Tags</p>
+    <ul class="scard-tags">
+      {{ range . }}
+        <li>
+          {{ if $self }}
+            <a href="{{ "posts/" | relURL }}?tag={{ . | urlquery }}">{{ . }}</a>
+          {{ else }}
+            {{ . }}
+          {{ end }}
+        </li>
+      {{ end }}
+    </ul>
+    {{ if not $self }}<hr class="scard-rule">{{ end }}
+  {{ end }}
+  {{ if not $self }}
+    <a class="scard-read" href="{{ $page.RelPermalink }}">記事を読む</a>
+  {{ end }}
+</article>

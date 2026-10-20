@@ -29,34 +29,34 @@
   {{ $latestTime := time $latest.date }}
 
 <section class="article-history-block" id="article-history">
-  <hr class="article-rule article-rule--full" aria-hidden="true">
-  <div class="article-history-card acard" data-card>
-    <div class="acard-row" tabindex="0">
-      <p class="article-hist-summary">
-        最終編集：<time datetime="{{ $latest.date }}">{{ $latestTime.Format "Jan 2, 2006" }}</time>
-      </p>
-      <button type="button" class="acard-icon" aria-expanded="false" aria-label="更新履歴を開く">+</button>
-    </div>
-    <div class="acard-body" hidden>
-      {{ range $i, $e := $entries }}
-        {{ $t := time $e.date }}
-        <div class="article-hist-revision">
-          <p class="article-hist-entry">
-            {{ with $e.url }}
-              <a class="article-hist-commit" href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $e.version }}: {{ $t.Format "Jan 2, 2006" }}</a>
-            {{ else }}
-              <span class="article-hist-commit">{{ $e.version }}: {{ $t.Format "Jan 2, 2006" }}</span>
-            {{ end }}
-            {{ with $e.author }}<span class="article-hist-editor">（編集者：{{ . }}）</span>{{ end }}
-          </p>
-          <p class="article-hist-msg">{{ $e.message }}</p>
-        </div>
-        {{ if lt (add $i 1) (len $entries) }}
-          <div class="article-hist-sep" role="separator" aria-hidden="true">–</div>
-        {{ end }}
+  <button type="button" class="article-updated" data-history-toggle aria-expanded="false" aria-controls="article-history-panel">
+    <span class="article-updated-label">Last Updated</span>
+    <span class="article-updated-ver">{{ $latest.version }}: {{ $latestTime.Format "Jan 2, 2006" }}</span>
+    <span class="article-updated-plus" aria-hidden="true">+</span>
+  </button>
+  <div class="history-accordion" id="article-history-panel" hidden>
+    {{ range $entries }}
+      {{ $t := time .date }}
+      {{ $commit := .url }}
+      {{ if $commit }}
+        <a class="history-entry" href="{{ $commit }}" target="_blank" rel="noopener noreferrer">
+      {{ else }}
+        <article class="history-entry">
       {{ end }}
-    </div>
+        <p class="history-modal-label">Date Updated</p>
+        <p class="history-modal-value">{{ .version }}: <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time></p>
+        <p class="history-modal-label">Updated by</p>
+        <p class="history-modal-value">{{ .author }}</p>
+        {{ with .message }}
+          <p class="history-modal-label">Change Summary</p>
+          <p class="history-modal-summary">{{ . }}</p>
+        {{ end }}
+      {{ if $commit }}
+        </a>
+      {{ else }}
+        </article>
+      {{ end }}
+    {{ end }}
   </div>
-  <hr class="article-rule article-rule--full" aria-hidden="true">
 </section>
 {{ end }}

@@ -4,39 +4,22 @@
 {{ with index $snapList 0 }}{{ $heroSnap = printf "snaps/%s" .file | relURL }}{{ end }}
 
 <header class="hero-mobile"{{ with $heroSnap }} style="--hero-image: url('{{ . }}')"{{ end }}>
-  <svg class="hero-logo" role="img" aria-label="いつもわかっている途中 Always Halfway Through Realising"><use href="#logo-hero"/></svg>
+  <svg class="hero-logo" viewBox="0 0 500 500" role="img" aria-label="いつもわかっている途中 Always Halfway Through Realising"><use href="#logo-hero"/></svg>
 </header>
 
 {{ $feed := partial "history-feed-data.html" . }}
 {{ $limit := 5 }}
 {{ $items := $feed }}
 {{ if gt (len $feed) $limit }}{{ $items = first $limit $feed }}{{ end }}
+{{ $newestDay := "" }}
+{{ with index $feed 0 }}{{ $newestDay = (time .date).Format "2006-01-02" }}{{ end }}
 <section class="history-home" id="history">
   <header class="section-head section-head--dark">
     <span class="section-head-mark" aria-hidden="true"></span>
     <h2>更新履歴</h2>
   </header>
   {{ if gt (len $feed) 0 }}
-    <ul class="hcard-list">
-      {{ range $items }}
-        {{ $t := time .date }}
-        <li class="hcard">
-          <span class="hcard-tab" aria-hidden="true"></span>
-          <h3 class="hcard-title">{{ .pageTitle }}</h3>
-          <p class="hcard-label">Date Updated</p>
-          <p class="hcard-value">{{ .version }}: <time datetime="{{ .date }}">{{ $t.Format "Jan 2, 2006" }}</time></p>
-          {{ with .author }}
-            <p class="hcard-label">Updated by</p>
-            <p class="hcard-value">{{ . }}</p>
-          {{ end }}
-          {{ with .message }}
-            <p class="hcard-label">Change Summary</p>
-            <p class="hcard-summary">{{ . }}</p>
-          {{ end }}
-          <a class="hcard-read" href="{{ .pageURL }}">記事を読む</a>
-        </li>
-      {{ end }}
-    </ul>
+    {{ partial "history-cards.html" (dict "items" $items "newestDay" $newestDay) }}
     <p class="history-all">
       <a href="{{ "history/" | relURL }}">すべての更新履歴を見る</a>
     </p>
@@ -89,6 +72,7 @@
   <h3 class="search-label">Category</h3>
   <div class="rule-line" aria-hidden="true"></div>
   <div class="filter-chips" data-filter-cats></div>
+  <div class="rule-line" aria-hidden="true"></div>
   <div class="rule-split" aria-hidden="true"></div>
 
   <h3 class="search-label">Tags</h3>
@@ -97,57 +81,13 @@
   <div class="rule-line" aria-hidden="true"></div>
 
   <div class="search-meta">
-    <p class="search-count"><span class="search-count-mark" aria-hidden="true"></span><span data-search-count>{{ $postCount }}</span>件の記事</p>
-    <button type="button" class="search-sort" data-search-sort data-dir="new">新しい順</button>
+    <p class="search-count"><span class="search-count-mark" aria-hidden="true"></span><span><span data-search-count>{{ $postCount }}</span>件の記事</span></p>
+    <button type="button" class="search-sort" data-search-sort data-dir="new"><span data-search-sort-label>新しい順</span><span class="search-sort-mark" data-search-sort-mark aria-hidden="true">▼</span></button>
   </div>
 
   <div class="scard-list" data-search-cards>
     {{ range $posts.ByDate.Reverse }}
-      {{ $cat := partial "cat.html" . }}
-      {{ $meta := partial "article-commit-meta.html" . }}
-      {{ $published := .Date }}
-      {{ $updated := .Lastmod }}
-      {{ if $updated.IsZero }}{{ $updated = $published }}{{ end }}
-      <article
-        class="scard"
-        data-search-card
-        data-category="{{ $cat }}"
-        data-date="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}"
-        {{ with .Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
-      >
-        <span class="scard-tab" aria-hidden="true"></span>
-        {{ with $cat }}
-          <p class="scard-cat">{{ . }}</p>
-        {{ end }}
-        <h3 class="scard-title">{{ .Title }}</h3>
-        <hr class="scard-rule">
-        {{ with .Params.description }}
-          <p class="scard-kicker">Summary</p>
-          <p class="scard-text">{{ . }}</p>
-          <hr class="scard-rule">
-        {{ end }}
-        {{ with .Params.author }}
-          <p class="scard-kicker">Author</p>
-          <p class="scard-text">{{ . }}</p>
-          <hr class="scard-rule">
-        {{ end }}
-        {{ if not $published.IsZero }}
-          <p class="scard-kicker">Published</p>
-          <p class="scard-text">{{ $meta.firstVersion }}: <time datetime="{{ $published.Format "2006-01-02" }}">{{ $published.Format "Jan 2, 2006" }}</time></p>
-          {{ if or (ne $meta.firstVersion $meta.version) (ne ($published.Format "2006-01-02") ($updated.Format "2006-01-02")) }}
-            <p class="scard-text">{{ $meta.version }}: <time datetime="{{ $updated.Format "2006-01-02" }}">{{ $updated.Format "Jan 2, 2006" }}</time></p>
-          {{ end }}
-          <hr class="scard-rule">
-        {{ end }}
-        {{ with .Params.tags }}
-          <p class="scard-kicker">Tags</p>
-          <ul class="scard-tags">
-            {{ range . }}<li>{{ . }}</li>{{ end }}
-          </ul>
-          <hr class="scard-rule">
-        {{ end }}
-        <a class="scard-read" href="{{ .RelPermalink }}">記事を読む</a>
-      </article>
+      {{ partial "search-card.html" (dict "page" . "search" true) }}
     {{ end }}
   </div>
 

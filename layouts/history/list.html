@@ -1,5 +1,18 @@
 {{ define "main" }}
+{{ $feed := partial "history-feed-data.html" . }}
+{{ $newestDay := "" }}
+{{ with index $feed 0 }}{{ $newestDay = (time .date).Format "2006-01-02" }}{{ end }}
 <div class="history-page">
-  {{ partial "history-feed.html" (dict "showAll" true "showMore" false) }}
+  <section class="history-home" id="history">
+    <header class="section-head section-head--dark">
+      <span class="section-head-mark" aria-hidden="true"></span>
+      <h2>更新履歴</h2>
+    </header>
+    {{ if gt (len $feed) 0 }}
+      {{ partial "history-cards.html" (dict "items" $feed "newestDay" $newestDay) }}
+    {{ else }}
+      <p class="history-empty">まだ更新履歴がありません。</p>
+    {{ end }}
+  </section>
 </div>
 {{ end }}

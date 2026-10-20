@@ -1,28 +1,6 @@
 {{ define "main" }}
 <article class="article" data-article>
-  {{ $cat := partial "cat.html" . }}
-  {{ if $cat }}
-    <hr class="article-rule" aria-hidden="true">
-    <p class="article-cat"><a href="{{ "posts/" | relURL }}?cat={{ $cat | urlquery }}">{{ $cat }}</a></p>
-  {{ end }}
-  <h1 class="article-title">{{ .Title }}</h1>
-  {{ with .Params.author }}<p class="article-author">{{ . }}</p>{{ end }}
-  {{ partial "article-dates.html" . }}
-  {{ with .Params.description }}
-    <hr class="article-rule" aria-hidden="true">
-    <p class="article-lead">{{ . }}</p>
-    <hr class="article-rule article-rule--after-lead" aria-hidden="true">
-  {{ end }}
-  {{ with .Params.tags }}
-    <div class="article-tags-row">
-      <span class="article-tags-label">tags:</span>
-      <ul class="article-tags">
-        {{ range . }}
-          <li><a href="{{ "posts/" | relURL }}?tag={{ . | urlquery }}">{{ . }}</a></li>
-        {{ end }}
-      </ul>
-    </div>
-  {{ end }}
+  {{ partial "search-card.html" (dict "page" . "self" true) }}
   {{ $page := . }}
   {{ $topImg := $page.Resources.Get "top.jpg" }}
   {{ $heroImg := $page.Resources.Get "hero.jpg" }}
@@ -30,20 +8,31 @@
   {{ if and (not $heroImg) $topImg }}{{ $heroImg = $topImg }}{{ end }}
   {{ with $heroImg }}
     {{ $meta := partial "bundle-image-caption.html" (dict "page" $page "name" .Name "captionParam" "hero_caption" "altParam" "hero_alt") }}
-    {{ $landscape := ge .Width .Height }}
-    <figure class="article-hero{{ if $landscape }} article-hero--landscape{{ else }} article-hero--portrait{{ end }}">
-      {{ if $landscape }}
-      <img src="{{ .RelPermalink }}" alt="{{ $meta.alt }}" loading="lazy" decoding="async">
-      {{ else }}
-      <div class="article-hero-media">
+    {{ $portrait := lt .Width .Height }}
+    <figure class="article-hero{{ if $portrait }} article-hero--portrait{{ end }}">
+      <div class="article-hero-stage">
         <img src="{{ .RelPermalink }}" alt="{{ $meta.alt }}" loading="lazy" decoding="async">
       </div>
-      {{ end }}
       {{ with $meta.caption }}<figcaption class="article-figure-caption">{{ . }}</figcaption>{{ end }}
     </figure>
   {{ end }}
-  <div class="article-body" data-article-body>
-    {{ .Content }}
+  <div class="article-body" data-article-body lang="ja">
+    {{ $parts := split .Content "<h2 " }}
+    {{ range $i, $part := $parts }}
+      {{ if eq $i 0 }}
+        {{ $part | safeHTML }}
+      {{ else }}
+        {{ $head := index (split $part "</h2>") 0 }}
+        {{ $sec := "abody-sec" }}
+        {{ if in $head "書誌情報" }}{{ $sec = "abody-sec abody-sec--bib" }}{{ end }}
+        {{ if in $head "葛藤ポイント" }}{{ $sec = "abody-sec abody-sec--points" }}{{ end }}
+        {{ if in $part ">Profile</h4>" }}
+          {{ $part = replaceRE `<h4 id="profile">Profile</h4>` `<div class="profile-block"><h4 id="profile">Profile</h4><div class="profile-main">` $part }}
+          {{ $part = print $part "</div></div>" }}
+        {{ end }}
+        {{ printf "<section class=\"%s\"><h2 %s</section>" $sec $part | safeHTML }}
+      {{ end }}
+    {{ end }}
   </div>
   {{ partial "history-timeline.html" . }}
   {{ partial "related-posts.html" . }}

@@ -1,0 +1,39 @@
+{{ $page := .page }}
+{{ $isSelf := .self }}
+{{ $cat := partial "cat.html" $page }}
+<div class="ameta">
+  <div class="ameta-tab" aria-hidden="true"></div>
+  {{ with $cat }}
+    <p class="ameta-kicker"><a href="{{ "posts/" | relURL }}?cat={{ . | urlquery }}">{{ . }}</a></p>
+  {{ end }}
+  {{ if $isSelf }}
+    <h1 class="article-title" lang="ja">{{ $page.Title }}</h1>
+  {{ else }}
+    <h3 class="ameta-title" lang="ja"><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
+  {{ end }}
+  {{ with $page.Params.description }}
+    <hr class="ameta-rule">
+    <p class="ameta-label">Summary</p>
+    <p class="ameta-value">{{ . }}</p>
+  {{ end }}
+  {{ with $page.Params.author }}
+    <hr class="ameta-rule">
+    <p class="ameta-label">Author</p>
+    <p class="ameta-value">{{ . }}</p>
+  {{ end }}
+  <hr class="ameta-rule">
+  <p class="ameta-label">Published</p>
+  {{ partial "article-dates.html" $page }}
+  {{ with $page.Params.tags }}
+    <hr class="ameta-rule">
+    <p class="ameta-label">Tags</p>
+    <ul class="ameta-tags">
+      {{ range . }}
+        <li><a href="{{ "posts/" | relURL }}?tag={{ . | urlquery }}">{{ . }}</a></li>
+      {{ end }}
+    </ul>
+  {{ end }}
+  {{ if not $isSelf }}
+    <a class="ameta-read" href="{{ $page.RelPermalink }}">記事を読む</a>
+  {{ end }}
+</div>
