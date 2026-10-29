@@ -830,7 +830,6 @@
     const tagBox = search ? search.querySelector("[data-filter-tags]") : null;
     const more = search ? search.querySelector("[data-search-more]") : null;
     const moreLink = search ? search.querySelector("[data-search-more-link]") : null;
-    const homeHref = document.querySelector(".site-bar-title")?.getAttribute("href") || "/";
     const state = { cats: [], tags: [], dir: "new" };
     let lastFocus = null;
 
@@ -876,6 +875,8 @@
       if (!search) return;
       const list = [...cards];
       list.sort((a, b) => {
+        const pin = (a.hasAttribute("data-pin") ? 0 : 1) - (b.hasAttribute("data-pin") ? 0 : 1);
+        if (pin) return pin;
         const da = a.getAttribute("data-date") || "";
         const db = b.getAttribute("data-date") || "";
         return state.dir === "old" ? da.localeCompare(db) : db.localeCompare(da);
@@ -930,7 +931,7 @@
         state.cats = presetCat ? [presetCat] : [];
         state.tags = presetTag ? [presetTag] : [];
       } else {
-        state.cats = ["はじめに"];
+        state.cats = ["お知らせ"];
         state.tags = ["葛藤"];
       }
       if (params.get("sort") === "old") state.dir = "old";
@@ -969,22 +970,16 @@
 
     openBtn.addEventListener("click", openMenu);
     closeBtns.forEach((btn) => btn.addEventListener("click", closeMenu));
-    menu.querySelector("[data-menu-apply]")?.addEventListener("click", () => {
+    menu.querySelectorAll("[data-menu-apply]").forEach((btn) => btn.addEventListener("click", () => {
       const cats = catInputs.filter((el) => el.checked).map((el) => el.value);
       const tags = tagInputs.filter((el) => el.checked).map((el) => el.value);
-      if (!search) {
-        const url = new URL(homeHref, window.location.origin);
-        cats.forEach((name) => url.searchParams.append("cat", name));
-        tags.forEach((name) => url.searchParams.append("tag", name));
-        window.location.href = url.toString();
-        return;
-      }
-      state.cats = cats;
-      state.tags = tags;
-      applySearch();
-      writeParams();
-      closeMenu();
-    });
+      const postsHref = btn.getAttribute("data-search-url") || "/posts/";
+      const url = new URL(postsHref, window.location.origin);
+      url.search = "";
+      cats.forEach((name) => url.searchParams.append("cat", name));
+      tags.forEach((name) => url.searchParams.append("tag", name));
+      window.location.href = url.toString();
+    }));
 
     document.addEventListener("keydown", (ev) => {
       if (menu.hidden) return;

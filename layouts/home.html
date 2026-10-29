@@ -86,7 +86,11 @@
   </div>
 
   <div class="scard-list" data-search-cards>
-    {{ range $posts.ByDate.Reverse }}
+    {{ $pinned := where $posts "Params.pin" true }}
+    {{ range $pinned.ByDate.Reverse }}
+      {{ partial "search-card.html" (dict "page" . "search" true) }}
+    {{ end }}
+    {{ range ($posts | complement $pinned).ByDate.Reverse }}
       {{ partial "search-card.html" (dict "page" . "search" true) }}
     {{ end }}
   </div>

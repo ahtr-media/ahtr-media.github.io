@@ -122,14 +122,75 @@ class Parser {
     return tops("normal") !== tops("auto-phrase");
   }
 
+  const ATOM_RE = /なお(?:す|し|さ|せ|っ|る|れ|ら|り)/g;
+
+  function atomRanges(text) {
+    const ranges = [];
+    ATOM_RE.lastIndex = 0;
+    let match;
+    while ((match = ATOM_RE.exec(text))) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+    return ranges;
+  }
+
+  function chunksWithAtoms(parser, text) {
+    const ranges = atomRanges(text);
+    const inside = (index) => ranges.some(([start, end]) => index > start && index < end);
+    const bounds = parser.parseBoundaries(text).filter((index) => !inside(index));
+    ranges.forEach(([start, end]) => {
+      if (start > 0) bounds.push(start);
+      if (text.startsWith("こと", end)) bounds.push(end);
+    });
+    const unique = [...new Set(bounds)].sort((a, b) => a - b);
+    const chunks = [];
+    let from = 0;
+    unique.forEach((index) => {
+      if (index > from) chunks.push(text.slice(from, index));
+      from = index;
+    });
+    chunks.push(text.slice(from));
+    return chunks;
+  }
+
+  function protectAtoms(target) {
+    if (target.querySelector(".phrase-atom")) return;
+    const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      const text = node.nodeValue;
+      const ranges = text ? atomRanges(text) : [];
+      if (!ranges.length) return;
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      ranges.forEach(([start, end]) => {
+        if (start > last) frag.append(text.slice(last, start));
+        frag.append(document.createElement("wbr"));
+        const span = document.createElement("span");
+        span.className = "phrase-atom";
+        span.textContent = text.slice(start, end);
+        frag.append(span);
+        if (text.startsWith("こと", end)) frag.append(document.createElement("wbr"));
+        last = end;
+      });
+      if (last < text.length) frag.append(text.slice(last));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
   function apply() {
-    if (autoPhraseApplies()) return;
-    const parser = new Parser(model);
-    document.querySelectorAll(".hcard-title, .hcard-summary, .scard-title").forEach((el) => {
+    const useBuiltin = autoPhraseApplies();
+    const parser = useBuiltin ? null : new Parser(model);
+    document.querySelectorAll(".hcard-title, .hcard-summary, .scard-title, .article-body h2, .article-body h3").forEach((el) => {
       const target = el.querySelector("a") || el;
       const text = target.textContent;
-      if (!text || text.includes(ZWSP)) return;
-      target.textContent = parser.parse(text).join(ZWSP);
+      if (!text || text.includes(ZWSP) || target.querySelector(".phrase-atom")) return;
+      if (!parser) {
+        protectAtoms(target);
+        return;
+      }
+      target.textContent = chunksWithAtoms(parser, text).join(ZWSP);
       el.classList.add("is-phrase-fallback");
     });
   }

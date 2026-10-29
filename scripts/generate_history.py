@@ -32,6 +32,14 @@ def safe_key_from_relpath(relpath: str) -> str:
     return relpath.replace("/", "__").replace(".", "_")
 
 
+def excluded_subject(subject: str) -> bool:
+    text = subject.strip()
+    if text == "Scheduled bulk update":
+        return True
+    folded = text.casefold()
+    return "content:" in folded or "design:" in folded
+
+
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     commit_base = repo_commit_base()
@@ -66,7 +74,7 @@ def main():
                 if len(parts) != 4:
                     continue
                 date_iso, author, subject, sha = parts
-                if subject.strip() == "Scheduled bulk update":
+                if excluded_subject(subject):
                     continue
                 items.append(
                     {

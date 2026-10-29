@@ -4,7 +4,8 @@ author: いつもわかっている途中
 date: 2026-06-27
 lastmod: 2026-06-27
 draft: false
-category: はじめに
+category: お知らせ
+pin: true
 tags:
   - 葛藤
 description: 『いつもわかっている途中』について紹介するページです。

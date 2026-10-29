@@ -46,11 +46,14 @@
         <a class="site-bar-title" id="site-menu-title" href="{{ "/" | relURL }}">Always Halfway Through Realising</a>
         <button type="button" class="site-bar-btn" data-menu-close>CLOSE</button>
       </div>
-      <div class="site-menu-body">
+      <div class="menu-search-bar">
         <header class="section-head section-head--dark">
           <span class="section-head-mark" aria-hidden="true"></span>
           <h2>記事検索</h2>
         </header>
+        <button type="button" class="menu-submit" data-menu-apply data-search-url="{{ "posts/" | relURL }}">検索</button>
+      </div>
+      <div class="site-menu-body">
         <div class="rule-split rule-split--menu" aria-hidden="true"></div>
         <h3 class="menu-label">Category</h3>
         <ul class="menu-list">
@@ -80,7 +83,7 @@
         {{ else }}
           <p class="menu-empty">タグはまだありません。</p>
         {{ end }}
-        <button type="button" class="menu-submit" data-menu-apply>検索</button>
+        <button type="button" class="menu-submit" data-menu-apply data-search-url="{{ "posts/" | relURL }}">検索</button>
       </div>
     </div>
   </div>

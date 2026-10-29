@@ -12,6 +12,7 @@
     data-search-card
     data-category="{{ $cat }}"
     data-date="{{ $page.Date.Format "2006-01-02T15:04:05Z07:00" }}"
+    {{ if $page.Params.pin }}data-pin{{ end }}
     {{ with $page.Params.tags }}data-tags="{{ delimit . " " }}"{{ end }}
   {{ end }}
 >
